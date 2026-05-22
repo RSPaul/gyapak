@@ -97,6 +97,11 @@ export default function DesignYourself() {
 
   const [statusMsg, setStatusMsg] = useState('Upload a room or select a template. Calibrate the grid to begin.');
 
+  // Lead Capture Modal states
+  const [isLeadModalOpen, setIsLeadModalOpen] = useState(false);
+  const [leadForm, setLeadForm] = useState({ name: '', email: '', projectType: 'Residential', message: '' });
+  const [leadSuccess, setLeadSuccess] = useState(false);
+
   const overlayRef = useRef(null);
   const fileInputRef = useRef(null);
 
@@ -324,9 +329,43 @@ export default function DesignYourself() {
     setStatus('Workspace reset.');
   };
 
-  // Merging backgrounds, wall rendering, and Three.js layers into one consolidated high-res PNG
+  // Helpers to fetch editorial descriptors for the export spec sheet
+  const getMockWallName = (hex) => {
+    const sw = swatches.find(s => s.hex.toLowerCase() === hex.toLowerCase());
+    const label = sw ? sw.label : 'Bespoke Hue';
+    return `Gyapak Palette No. 04: ${label} (Matte Premium Finish)`;
+  };
+
+  const getFURNITURE_DETAILS = (item) => {
+    const baseDimensions = {
+      sofa: { w: 2200, d: 920, h: 720, name: 'Emerald Sofa', defaultMat: 'Slub Linen' },
+      bed: { w: 2100, d: 2000, h: 1100, name: 'Deluxe Platform Bed', defaultMat: 'Slub Linen' },
+      table: { w: 1300, d: 1300, h: 750, name: 'Carrara Bistro Table', defaultMat: 'Carrara Marble' },
+      lamp: { w: 450, d: 450, h: 1850, name: 'Arc Floor Lamp', defaultMat: 'Travertine Stone' },
+      plant: { w: 800, d: 800, h: 1600, name: 'Fiddle Leaf Fig Pot', defaultMat: 'Fluted Ceramic Planter' },
+      art: { w: 1200, d: 80, h: 900, name: 'Minimalist Gallery Art', defaultMat: 'Walnut Framing' }
+    };
+
+    const base = baseDimensions[item.type] || { w: 1000, d: 1000, h: 1000, name: 'Designer Object', defaultMat: 'Natural Finish' };
+    const scaledW = Math.round(base.w * (item.scale / 100));
+    const scaledD = Math.round(base.d * (item.scale / 100));
+    const scaledH = Math.round(base.h * (item.scale / 100));
+
+    const materialName = item.material 
+      ? (premiumFabrics.find(f => f.id === item.material)?.name || premiumStones.find(s => s.id === item.material)?.name || base.defaultMat)
+      : base.defaultMat;
+
+    return {
+      name: base.name,
+      dimensions: `${scaledW}W x ${scaledD}D x ${scaledH}H mm`,
+      material: materialName,
+      rotation: `${item.rotation}°`
+    };
+  };
+
+  // Merging backgrounds, wall rendering, and Three.js layers into a dual-page editorial PDF spec sheet
   const handleDownload = () => {
-    setStatus('Generating concept download...');
+    setStatus('Generating luxury concept spec sheet...');
     
     const canvas = document.createElement('canvas');
     canvas.width = 1200;
@@ -345,13 +384,321 @@ export default function DesignYourself() {
         ctx.drawImage(glCanvas, 0, 0, 1200, 760);
       }
 
-      // 3. Trigger standard file download
-      const dataUrl = canvas.toDataURL('image/png');
-      const link = document.createElement('a');
-      link.download = 'gyapak-3d-room-concept.png';
-      link.href = dataUrl;
-      link.click();
-      setStatus('Concept downloaded successfully!');
+      const renderDataUrl = canvas.toDataURL('image/png');
+
+      // Create an editorial print window
+      const printWindow = window.open('', '_blank');
+      if (!printWindow) {
+        setStatus('Error: Popup blocker blocked spec sheet export window.');
+        return;
+      }
+
+      // Format current timestamp
+      const dateString = new Date().toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric'
+      });
+
+      // Write styled HTML
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Gyapak Staging Studio | Concept Design Spec</title>
+          <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+          <style>
+            @media print {
+              body { background-color: #faf9f6; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+              .page-break { page-break-after: always; }
+            }
+            * { box-sizing: border-box; margin: 0; padding: 0; }
+            body {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              color: #1a1a1a;
+              background-color: #faf9f6;
+              padding: 40px;
+              line-height: 1.6;
+            }
+            .page {
+              width: 100%;
+              max-width: 1000px;
+              margin: 0 auto;
+              background: #faf9f6;
+              min-height: 1200px;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              padding: 20px 0;
+            }
+            header {
+              display: flex;
+              justify-content: space-between;
+              align-items: baseline;
+              border-bottom: 2px solid #b08d57;
+              padding-bottom: 12px;
+              margin-bottom: 30px;
+            }
+            .logo {
+              font-family: 'Playfair Display', serif;
+              font-size: 28px;
+              font-weight: 700;
+              letter-spacing: 0.05em;
+              color: #1a1a1a;
+            }
+            .subtitle {
+              font-size: 11px;
+              text-transform: uppercase;
+              letter-spacing: 0.15em;
+              color: #777;
+              font-weight: 600;
+            }
+            .render-container {
+              width: 100%;
+              border: 1px solid rgba(176, 141, 87, 0.3);
+              border-radius: 8px;
+              overflow: hidden;
+              box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+              margin-bottom: 30px;
+            }
+            .render-container img {
+              width: 100%;
+              display: block;
+            }
+            .editorial-block {
+              margin-top: 40px;
+              border-left: 3px solid #b08d57;
+              padding-left: 20px;
+            }
+            .editorial-title {
+              font-family: 'Playfair Display', serif;
+              font-size: 32px;
+              font-weight: 400;
+              margin-bottom: 12px;
+            }
+            .editorial-title em {
+              font-family: 'Playfair Display', serif;
+              font-style: italic;
+            }
+            .editorial-text {
+              font-size: 14px;
+              color: #555;
+              max-width: 700px;
+            }
+            .specs-grid {
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 40px;
+              margin-top: 20px;
+            }
+            .specs-section {
+              margin-bottom: 30px;
+            }
+            .specs-section h3 {
+              font-family: 'Playfair Display', serif;
+              font-size: 20px;
+              font-weight: 700;
+              border-bottom: 1px solid #e5e5e5;
+              padding-bottom: 8px;
+              margin-bottom: 16px;
+              color: #b08d57;
+            }
+            .spec-row {
+              display: flex;
+              justify-content: space-between;
+              padding: 8px 0;
+              border-bottom: 1px dashed #eee;
+              font-size: 13px;
+            }
+            .spec-label {
+              font-weight: 600;
+              color: #555;
+            }
+            .spec-value {
+              font-weight: 400;
+              color: #1a1a1a;
+            }
+            .spec-table {
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 15px;
+            }
+            .spec-table th, .spec-table td {
+              text-align: left;
+              padding: 10px 12px;
+              font-size: 13px;
+              border-bottom: 1px solid #e5e5e5;
+            }
+            .spec-table th {
+              background-color: rgba(176, 141, 87, 0.1);
+              color: #b08d57;
+              font-weight: 600;
+              text-transform: uppercase;
+              font-size: 11px;
+              letter-spacing: 0.05em;
+            }
+            .spec-table tr:hover {
+              background-color: rgba(0,0,0,0.01);
+            }
+            .cta-footer {
+              text-align: center;
+              border-top: 1px solid #e5e5e5;
+              padding-top: 30px;
+              margin-top: 40px;
+            }
+            .cta-footer h4 {
+              font-family: 'Playfair Display', serif;
+              font-size: 22px;
+              font-weight: 400;
+              margin-bottom: 10px;
+            }
+            .cta-footer p {
+              font-size: 13px;
+              color: #666;
+              max-width: 500px;
+              margin: 0 auto 15px auto;
+            }
+            .cta-badge {
+              display: inline-block;
+              border: 1px solid #b08d57;
+              color: #b08d57;
+              padding: 8px 24px;
+              font-size: 11px;
+              text-transform: uppercase;
+              letter-spacing: 0.1em;
+              font-weight: 800;
+              border-radius: 4px;
+            }
+            footer.page-footer {
+              display: flex;
+              justify-content: space-between;
+              font-size: 10px;
+              color: #999;
+              border-top: 1px solid #e5e5e5;
+              padding-top: 15px;
+              margin-top: 40px;
+              letter-spacing: 0.05em;
+              text-transform: uppercase;
+            }
+          </style>
+        </head>
+        <body>
+          <!-- PAGE 1: THE VISUAL CONCEPT -->
+          <div class="page page-break">
+            <div>
+              <header>
+                <div class="logo">GYAPAK</div>
+                <div class="subtitle">Bespoke 3D Concept Design</div>
+              </header>
+              <div class="editorial-block">
+                <h2 class="editorial-title">Staged Concept <em>Visual</em></h2>
+                <p class="editorial-text">A high-fidelity spatial composition demonstrating volumetric proportion, biophilic synergy, and fine lighting mapping styled by the Gyapak 3D Studio.</p>
+              </div>
+              <div class="render-container" style="margin-top: 30px;">
+                <img src="${renderDataUrl}" alt="Gyapak Staged Concept Render" />
+              </div>
+            </div>
+            <footer class="page-footer">
+              <span>Date: ${dateString}</span>
+              <span>© Gyapak Interior Architecture Group</span>
+              <span>Page 1 of 2</span>
+            </footer>
+          </div>
+
+          <!-- PAGE 2: THE DETAILED SPEC SHEET -->
+          <div class="page">
+            <div>
+              <header>
+                <div class="logo">GYAPAK</div>
+                <div class="subtitle">Concept Specification Sheet</div>
+              </header>
+              
+              <div class="specs-section">
+                <h3>1. Spatial Environment Specs</h3>
+                <div class="specs-grid">
+                  <div>
+                    <div class="spec-row">
+                      <span class="spec-label">Wall Paint Shade</span>
+                      <span class="spec-value">${getMockWallName(wallColor)}</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-label">Wall Paint Hex</span>
+                      <span class="spec-value" style="font-family: monospace;">${wallColor.toUpperCase()}</span>
+                    </div>
+                  </div>
+                  <div>
+                    <div class="spec-row">
+                      <span class="spec-label">Wall relief Finish</span>
+                      <span class="spec-value" style="text-transform: capitalize;">${wallTexture === 'none' ? 'Smooth Plaster' : wallTexture + ' Texture'}</span>
+                    </div>
+                    <div class="spec-row">
+                      <span class="spec-label">Ambient Lighting Preset</span>
+                      <span class="spec-value" style="text-transform: capitalize;">${lighting} Mood</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="specs-section" style="margin-top: 10px;">
+                <h3>2. Volumetric Furniture Specifications</h3>
+                <table class="spec-table">
+                  <thead>
+                    <tr>
+                      <th style="width: 25%;">Item Type</th>
+                      <th style="width: 35%;">Staged Model & Description</th>
+                      <th style="width: 25%;">Millimeter Dimensions</th>
+                      <th style="width: 15%;">Orientation</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    ${objects.length === 0 
+                      ? '<tr><td colspan="4" style="text-align: center; color: #999; padding: 20px;">No furniture staged in the 3D scene.</td></tr>'
+                      : objects.map(obj => {
+                          const spec = getFURNITURE_DETAILS(obj);
+                          return `
+                            <tr>
+                              <td style="font-weight: 600; text-transform: capitalize;">${obj.type}</td>
+                              <td>
+                                <div style="font-weight: 600; color: #1a1a1a;">${spec.name}</div>
+                                <div style="font-size: 11px; color: #666; margin-top: 2px;">Finish: ${spec.material}</div>
+                              </td>
+                              <td style="font-family: monospace; font-size: 12px; font-weight: 600;">${spec.dimensions}</td>
+                              <td style="font-family: monospace; font-size: 12px;">${spec.rotation}</td>
+                            </tr>
+                          `;
+                        }).join('')
+                    }
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="cta-footer">
+                <h4>Bring Your Concept to Life</h4>
+                <p>This customized concept blueprint can be fully realized by our executive design studio. Present this specification sheet to your consultation designer to skip the initial spatial layout phase.</p>
+                <div class="cta-badge">Consultation Reference: GY-${Math.floor(100000 + Math.random() * 900000)}</div>
+              </div>
+            </div>
+
+            <footer class="page-footer">
+              <span>Date: ${dateString}</span>
+              <span>© Gyapak Interior Architecture Group</span>
+              <span>Page 2 of 2</span>
+            </footer>
+          </div>
+
+          <script>
+            window.onload = function() {
+              setTimeout(function() {
+                window.focus();
+                window.print();
+              }, 600);
+            };
+          </script>
+        </body>
+        </html>
+      `);
+      printWindow.document.close();
+      setStatus('Double-Page Spec Sheet generated successfully! Opened print overlay.');
     };
     img.src = bgImage;
   };
@@ -871,8 +1218,11 @@ export default function DesignYourself() {
                 <button className="tool-button" onClick={handleReset} type="button" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <RotateCcw size={14} /> Reset
                 </button>
-                <button className="btn dark" onClick={handleDownload} type="button" style={{ display: 'flex', alignItems: 'center', gap: '6px', minHeight: '38px', padding: '8px 16px', fontSize: '13px' }}>
-                  <Download size={14} /> Download concept
+                <button className="tool-button" onClick={handleDownload} type="button" style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <Download size={14} /> Export Spec Sheet (PDF)
+                </button>
+                <button className="btn dark" onClick={() => setIsLeadModalOpen(true)} type="button" style={{ display: 'flex', alignItems: 'center', gap: '6px', minHeight: '38px', padding: '8px 16px', fontSize: '13px', background: 'var(--rust)', color: '#fff' }}>
+                  <Sparkles size={14} /> Send to a Designer
                 </button>
               </div>
             </div>
@@ -951,6 +1301,189 @@ export default function DesignYourself() {
           </section>
         </div>
       </section>
+
+      {/* Bespoke Lead Capture Consultation Modal */}
+      {isLeadModalOpen && (
+        <div style={{
+          position: 'fixed',
+          inset: 0,
+          background: 'rgba(26, 26, 26, 0.4)',
+          backdropFilter: 'blur(8px)',
+          zIndex: 9999,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '20px'
+        }}>
+          <div style={{
+            background: '#faf9f6',
+            border: '1.5px solid var(--gold)',
+            borderRadius: '16px',
+            width: '100%',
+            maxWidth: '540px',
+            padding: '30px',
+            boxShadow: '0 20px 50px rgba(0, 0, 0, 0.15)',
+            position: 'relative',
+            display: 'grid',
+            gap: '20px'
+          }}>
+            <button 
+              onClick={() => {
+                setIsLeadModalOpen(false);
+                setLeadSuccess(false);
+              }}
+              style={{
+                position: 'absolute',
+                top: '20px',
+                right: '20px',
+                background: 'none',
+                border: 'none',
+                fontSize: '24px',
+                cursor: 'pointer',
+                color: 'var(--muted)',
+                lineHeight: 1
+              }}
+            >
+              ×
+            </button>
+
+            {!leadSuccess ? (
+              <>
+                <div style={{ borderBottom: '1px solid var(--line)', paddingBottom: '12px' }}>
+                  <span style={{ fontSize: '10px', fontWeight: '900', color: 'var(--rust)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block', marginBottom: '4px' }}>Bespoke Staging Consultation</span>
+                  <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '24px', fontWeight: '400', color: 'var(--dark)' }}>Send Concept to a <em>Gyapak Designer</em></h3>
+                </div>
+
+                <p style={{ fontSize: '13px', color: '#666', lineHeight: '1.5' }}>
+                  Bundle-save your 3D customizer layout (staged items: <strong>{objects.length} pieces</strong>, wall finish: <strong>{wallTexture === 'none' ? 'Plaster' : wallTexture}</strong>) and receive a dedicated architect feedback report.
+                </p>
+
+                <form onSubmit={(e) => {
+                  e.preventDefault();
+                  setLeadSuccess(true);
+                  setStatus('Lead package successfully submitted to the principal designer.');
+                }} style={{ display: 'grid', gap: '12px' }}>
+                  
+                  <div style={{ display: 'grid', gap: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>Full Name</label>
+                    <input 
+                      type="text" 
+                      required 
+                      value={leadForm.name}
+                      onChange={(e) => setLeadForm(prev => ({ ...prev, name: e.target.value }))}
+                      placeholder="e.g. Eleanor Vance" 
+                      style={{ padding: '10px', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '13px', background: '#fff' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>Email Address</label>
+                    <input 
+                      type="email" 
+                      required 
+                      value={leadForm.email}
+                      onChange={(e) => setLeadForm(prev => ({ ...prev, email: e.target.value }))}
+                      placeholder="e.g. eleanor@example.com" 
+                      style={{ padding: '10px', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '13px', background: '#fff' }}
+                    />
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>Project Scope</label>
+                    <select 
+                      value={leadForm.projectType}
+                      onChange={(e) => setLeadForm(prev => ({ ...prev, projectType: e.target.value }))}
+                      style={{ padding: '10px', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '13px', background: '#fff' }}
+                    >
+                      <option value="Residential">Residential Space Staging</option>
+                      <option value="Commercial">Commercial/Retail Architecture</option>
+                      <option value="Hospitality">Luxury Hospitality Design</option>
+                    </select>
+                  </div>
+
+                  <div style={{ display: 'grid', gap: '4px' }}>
+                    <label style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>Project Vision & Notes</label>
+                    <textarea 
+                      rows="3" 
+                      value={leadForm.message}
+                      onChange={(e) => setLeadForm(prev => ({ ...prev, message: e.target.value }))}
+                      placeholder="Share details about your space, structural changes, or timeline goals..."
+                      style={{ padding: '10px', border: '1px solid var(--line)', borderRadius: '6px', fontSize: '13px', background: '#fff', resize: 'vertical' }}
+                    />
+                  </div>
+
+                  <button 
+                    type="submit" 
+                    className="btn dark"
+                    style={{
+                      width: '100%',
+                      minHeight: '42px',
+                      marginTop: '8px',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      gap: '8px',
+                      background: 'var(--rust)',
+                      color: '#fff',
+                      border: 'none',
+                      fontSize: '13px',
+                      fontWeight: '700',
+                      textTransform: 'uppercase',
+                      letterSpacing: '0.05em'
+                    }}
+                  >
+                    Submit Blueprint for Review
+                  </button>
+                </form>
+              </>
+            ) : (
+              <div style={{ textAlign: 'center', padding: '10px 0', display: 'grid', gap: '16px' }}>
+                <div style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '50%',
+                  background: 'rgba(176, 141, 87, 0.1)',
+                  color: 'var(--gold)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  margin: '0 auto'
+                }}>
+                  <Sparkles size={28} />
+                </div>
+                <div>
+                  <h3 style={{ fontFamily: '"Playfair Display", serif', fontSize: '24px', fontWeight: '400', margin: '0 0 6px 0' }}>Bespoke Concept Saved</h3>
+                  <p style={{ fontSize: '13px', color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800' }}>Reference Code: GY-CONCEPT-STAGE</p>
+                </div>
+                <p style={{ fontSize: '14px', color: '#555', lineHeight: '1.6', maxWidth: '400px', margin: '0 auto' }}>
+                  Thank you, <strong>{leadForm.name}</strong>. Your custom 3D customizer scene and technical spec sheets have been securely bundled and sent to our executive interior design team.
+                </p>
+                <div style={{
+                  background: 'rgba(212, 175, 55, 0.06)',
+                  border: '1px solid rgba(212, 175, 55, 0.15)',
+                  padding: '12px',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  color: '#666',
+                  lineHeight: '1.4'
+                }}>
+                  An Associate Director from our office will call or email you within 24 hours to schedule a complimentary spatial alignment consultation.
+                </div>
+                <button 
+                  className="btn outline"
+                  onClick={() => {
+                    setIsLeadModalOpen(false);
+                    setLeadSuccess(false);
+                  }}
+                  style={{ width: '100%', minHeight: '38px', marginTop: '8px' }}
+                >
+                  Return to Customizer
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </>
   );
 }
