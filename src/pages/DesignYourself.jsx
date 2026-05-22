@@ -22,13 +22,53 @@ const swatches = [
 
 // Default dimensions for furniture shapes
 const furnitureDefaults = {
-  sofa: { color: '#315f73', scale: 100, rotation: 0 },
-  bed: { color: '#d9cab8', scale: 100, rotation: 0 },
-  table: { color: '#8b5b3d', scale: 100, rotation: 0 },
-  lamp: { color: '#b88a44', scale: 100, rotation: 0 },
-  plant: { color: '#28634f', scale: 100, rotation: 0 },
-  art: { color: '#a94f36', scale: 100, rotation: 0 }
+  sofa: { color: '#315f73', scale: 100, rotation: 0, material: 'linen' },
+  bed: { color: '#d9cab8', scale: 100, rotation: 0, material: 'linen' },
+  table: { color: '#8b5b3d', scale: 100, rotation: 0, material: 'marble' },
+  lamp: { color: '#b88a44', scale: 100, rotation: 0, material: 'travertine' },
+  plant: { color: '#28634f', scale: 100, rotation: 0, material: 'none' },
+  art: { color: '#a94f36', scale: 100, rotation: 0, material: 'none' }
 };
+
+// Premium Fabrics Specification
+const premiumFabrics = [
+  { id: 'boucle', name: 'Belgian Bouclé', desc: 'Tactile, cozy loopy wool texture' },
+  { id: 'leather', name: 'Saddle Leather', desc: 'Premium distressed pore leather' },
+  { id: 'corduroy', name: 'Ribbed Corduroy', desc: 'Parallel ribbed soft wales' },
+  { id: 'linen', name: 'Slub Linen', desc: 'Crisp organic raw fiber weave' }
+];
+
+// Premium Stones & Hard Surfaces Specification
+const premiumStones = [
+  { id: 'marble', name: 'Carrara Marble', desc: 'Polished grey-veined luxury marble' },
+  { id: 'travertine', name: 'Travertine Stone', desc: 'Porous warm organic volcanic rock' },
+  { id: 'bronze', name: 'Brushed Bronze', desc: 'Horizontal brushed metal texture' },
+  { id: 'wood', name: 'Walnut Wood', desc: 'Rich walnut relief relief grain' }
+];
+
+// Luxury Color Palettes
+const fabricColors = [
+  { label: 'Oatmeal Bouclé', hex: '#d9d0c1' },
+  { label: 'Saddle Tan', hex: '#9c6644' },
+  { label: 'Desert Terracotta', hex: '#a94f36' },
+  { label: 'Forest Moss', hex: '#2e3d30' },
+  { label: 'Midnight Indigo', hex: '#1e2d42' }
+];
+
+const surfaceColors = [
+  { label: 'Carrara White', hex: '#faf9f6' },
+  { label: 'Travertine Ochre', hex: '#ebe0d0' },
+  { label: 'Brushed Bronze', hex: '#b08d57' },
+  { label: 'Espresso Walnut', hex: '#5c3a21' }
+];
+
+const artColors = [
+  { label: 'Minimalist Ivory', hex: '#e8e3d8' },
+  { label: 'Muted Clay', hex: '#a94f36' },
+  { label: 'Teal Lagoon', hex: '#315f73' },
+  { label: 'Warm Ochre', hex: '#cfbfa3' },
+  { label: 'Carbon Black', hex: '#1c1c1c' }
+];
 
 export default function DesignYourself() {
   // Room state
@@ -89,7 +129,8 @@ export default function DesignYourself() {
       z: 0,
       color: defaults.color,
       scale: defaults.scale,
-      rotation: defaults.rotation
+      rotation: defaults.rotation,
+      material: defaults.material
     };
 
     setObjects(prev => [...prev, newItem]);
@@ -110,6 +151,22 @@ export default function DesignYourself() {
     setObjects(prev => prev.map((item, idx) => 
       idx === selectedId ? { ...item, rotation: Number(val) } : item
     ));
+  };
+
+  const handleMaterialChange = (val) => {
+    if (selectedId < 0) return;
+    setObjects(prev => prev.map((item, idx) => 
+      idx === selectedId ? { ...item, material: val } : item
+    ));
+    setStatus(`Premium material updated to: ${val}.`);
+  };
+
+  const handleColorChange = (val) => {
+    if (selectedId < 0) return;
+    setObjects(prev => prev.map((item, idx) => 
+      idx === selectedId ? { ...item, color: val } : item
+    ));
+    setStatus(`Custom material color preset applied.`);
   };
 
   // Dragging objects on ground plane handler
@@ -516,11 +573,25 @@ export default function DesignYourself() {
                 ))}
               </div>
 
-              {/* Selected object translation */}
+              {/* Spec & Customization Studio Sidebar */}
               {activeItem && (
-                <div style={{ display: 'grid', gap: '8px', background: '#fcfbf7', padding: '10px', borderRadius: '6px', border: '1px solid var(--line)', marginTop: '8px' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontSize: '12px', fontWeight: '900', color: 'var(--rust)', textTransform: 'uppercase' }}>Active: {activeItem.type}</span>
+                <div style={{
+                  display: 'grid',
+                  gap: '16px',
+                  background: 'rgba(252, 251, 247, 0.85)',
+                  backdropFilter: 'blur(10px)',
+                  padding: '16px',
+                  borderRadius: '12px',
+                  border: '1px solid rgba(212, 175, 55, 0.25)',
+                  marginTop: '12px',
+                  boxShadow: '0 8px 32px 0 rgba(0, 0, 0, 0.05)'
+                }}>
+                  {/* Studio Header */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid var(--line)', paddingBottom: '8px' }}>
+                    <div>
+                      <span style={{ fontSize: '10px', fontWeight: '900', color: 'var(--rust)', letterSpacing: '0.1em', textTransform: 'uppercase', display: 'block' }}>Spec & Customization Studio</span>
+                      <span style={{ fontSize: '14px', fontWeight: '700', color: 'var(--dark)', fontFamily: '"Outfit", sans-serif', textTransform: 'capitalize' }}>{activeItem.type} Customizer</span>
+                    </div>
                     <button 
                       className="tool-button" 
                       onClick={() => {
@@ -528,39 +599,242 @@ export default function DesignYourself() {
                         setSelectedId(-1);
                         setStatus('Furniture item removed.');
                       }}
-                      style={{ minHeight: '26px', padding: '2px 6px', fontSize: '10px', flex: 'none', background: '#fff0f0', color: '#cc0000', borderColor: '#ffcccc' }}
+                      style={{
+                        minHeight: '28px',
+                        padding: '4px 10px',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        flex: 'none',
+                        background: 'rgba(255, 240, 240, 0.8)',
+                        color: '#cc0000',
+                        borderColor: 'rgba(255, 204, 204, 0.6)',
+                        borderRadius: '6px',
+                        transition: 'all 0.2s ease'
+                      }}
                     >
-                      Delete
+                      Delete Item
                     </button>
                   </div>
                   
-                  <div className="range">
-                    <label className="range-label">
-                      <span>Proportional Size</span>
-                      <span>{activeItem.scale}%</span>
-                    </label>
-                    <input 
-                      type="range" 
-                      min="50" 
-                      max="180" 
-                      value={activeItem.scale} 
-                      onChange={(e) => handleScaleChange(e.target.value)}
-                    />
+                  {/* 1. Dimension & Scale Controls */}
+                  <div style={{ display: 'grid', gap: '10px' }}>
+                    <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>1. Physical Blueprint Controls</span>
+                    
+                    <div className="range">
+                      <label className="range-label">
+                        <span style={{ fontSize: '12px', color: 'var(--dark)' }}>Scale Modifier</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--rust)' }}>{activeItem.scale}%</span>
+                      </label>
+                      <input 
+                        type="range" 
+                        min="50" 
+                        max="180" 
+                        value={activeItem.scale} 
+                        onChange={(e) => handleScaleChange(e.target.value)}
+                        style={{ height: '4px' }}
+                      />
+                    </div>
+
+                    <div className="range">
+                      <label className="range-label">
+                        <span style={{ fontSize: '12px', color: 'var(--dark)' }}>Y-Rotation (Angle)</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--rust)' }}>{activeItem.rotation}°</span>
+                      </label>
+                      <input 
+                        type="range" 
+                        min="-180" 
+                        max="180" 
+                        value={activeItem.rotation} 
+                        onChange={(e) => handleRotationChange(e.target.value)}
+                        style={{ height: '4px' }}
+                      />
+                    </div>
                   </div>
 
-                  <div className="range">
-                    <label className="range-label">
-                      <span>Y-Axis Rotation</span>
-                      <span>{activeItem.rotation}°</span>
-                    </label>
-                    <input 
-                      type="range" 
-                      min="-180" 
-                      max="180" 
-                      value={activeItem.rotation} 
-                      onChange={(e) => handleRotationChange(e.target.value)}
-                    />
-                  </div>
+                  {/* 2. Premium Tactile Finishes & Customizer */}
+                  {(activeItem.type === 'sofa' || activeItem.type === 'bed') && (
+                    <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Select Upholstery Fabric</span>
+                      
+                      {/* Fabric Selection Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                        {premiumFabrics.map(fab => {
+                          const isActive = activeItem.material === fab.id;
+                          return (
+                            <button
+                              key={fab.id}
+                              onClick={() => handleMaterialChange(fab.id)}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                padding: '8px 10px',
+                                background: isActive ? 'rgba(212, 175, 55, 0.08)' : 'rgba(255, 255, 255, 0.6)',
+                                border: isActive ? '1.5px solid var(--gold)' : '1px solid var(--line)',
+                                borderRadius: '8px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isActive ? '0 4px 12px rgba(212,175,55,0.15)' : 'none'
+                              }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                                <span style={{ fontSize: '12px', fontWeight: '700', color: isActive ? 'var(--dark)' : 'var(--muted)' }}>{fab.name}</span>
+                                {isActive && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--gold)' }} />}
+                              </span>
+                              <span style={{ fontSize: '9px', color: '#777', marginTop: '2px', lineHeight: '1.2' }}>{fab.desc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Fabric Color Swatches */}
+                      <div style={{ display: 'grid', gap: '6px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>3. Designer Drapery Color</span>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          {fabricColors.map(color => {
+                            const isActive = activeItem.color === color.hex;
+                            return (
+                              <button
+                                key={color.hex}
+                                onClick={() => handleColorChange(color.hex)}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '50%',
+                                  background: color.hex,
+                                  border: isActive ? '2px solid var(--dark)' : '1px solid rgba(0,0,0,0.15)',
+                                  outline: isActive ? '2px solid var(--gold)' : 'none',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'transform 0.15s ease',
+                                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                                }}
+                                title={color.label}
+                                aria-label={color.label}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {(activeItem.type === 'table' || activeItem.type === 'lamp') && (
+                    <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Select Hard Surface Material</span>
+                      
+                      {/* Stone/Metal Selection Cards */}
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: '8px' }}>
+                        {premiumStones.map(stone => {
+                          const isActive = activeItem.material === stone.id;
+                          return (
+                            <button
+                              key={stone.id}
+                              onClick={() => handleMaterialChange(stone.id)}
+                              style={{
+                                display: 'flex',
+                                flexDirection: 'column',
+                                alignItems: 'flex-start',
+                                padding: '8px 10px',
+                                background: isActive ? 'rgba(212, 175, 55, 0.08)' : 'rgba(255, 255, 255, 0.6)',
+                                border: isActive ? '1.5px solid var(--gold)' : '1px solid var(--line)',
+                                borderRadius: '8px',
+                                textAlign: 'left',
+                                cursor: 'pointer',
+                                transition: 'all 0.25s cubic-bezier(0.4, 0, 0.2, 1)',
+                                boxShadow: isActive ? '0 4px 12px rgba(212,175,55,0.15)' : 'none'
+                              }}
+                            >
+                              <span style={{ display: 'flex', alignItems: 'center', width: '100%', justifyContent: 'space-between' }}>
+                                <span style={{ fontSize: '12px', fontWeight: '700', color: isActive ? 'var(--dark)' : 'var(--muted)' }}>{stone.name}</span>
+                                {isActive && <span style={{ width: '6px', height: '6px', borderRadius: '50%', background: 'var(--gold)' }} />}
+                              </span>
+                              <span style={{ fontSize: '9px', color: '#777', marginTop: '2px', lineHeight: '1.2' }}>{stone.desc}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+
+                      {/* Surface Finish Swatches - dynamically customizable */}
+                      <div style={{ display: 'grid', gap: '6px', marginTop: '4px' }}>
+                        <span style={{ fontSize: '10px', fontWeight: '800', color: 'var(--muted)', textTransform: 'uppercase' }}>3. Material Shade & Finish Variation</span>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
+                          {surfaceColors.map(color => {
+                            const isActive = activeItem.color === color.hex;
+                            return (
+                              <button
+                                key={color.hex}
+                                onClick={() => handleColorChange(color.hex)}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '50%',
+                                  background: color.hex,
+                                  border: isActive ? '2px solid var(--dark)' : '1px solid rgba(0,0,0,0.15)',
+                                  outline: isActive ? '2px solid var(--gold)' : 'none',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'transform 0.15s ease',
+                                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                                }}
+                                title={color.label}
+                                aria-label={color.label}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeItem.type === 'art' && (
+                    <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Fine Art Canvas & Palette</span>
+                      
+                      <div style={{ display: 'grid', gap: '6px' }}>
+                        <span style={{ fontSize: '10px', color: '#666', lineHeight: '1.4' }}>Select a curated agency art frame palette. Adjusts the key contrast tone inside the floating gallery canvas.</span>
+                        <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', marginTop: '6px' }}>
+                          {artColors.map(color => {
+                            const isActive = activeItem.color === color.hex;
+                            return (
+                              <button
+                                key={color.hex}
+                                onClick={() => handleColorChange(color.hex)}
+                                style={{
+                                  width: '28px',
+                                  height: '28px',
+                                  borderRadius: '50%',
+                                  background: color.hex,
+                                  border: isActive ? '2px solid var(--dark)' : '1px solid rgba(0,0,0,0.15)',
+                                  outline: isActive ? '2px solid var(--gold)' : 'none',
+                                  cursor: 'pointer',
+                                  padding: 0,
+                                  transition: 'transform 0.15s ease',
+                                  transform: isActive ? 'scale(1.1)' : 'scale(1)'
+                                }}
+                                title={color.label}
+                                aria-label={color.label}
+                              />
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {activeItem.type === 'plant' && (
+                    <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
+                      <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Biophilic Accent Details</span>
+                      <div style={{ padding: '10px', background: 'rgba(255,255,255,0.4)', borderRadius: '8px', border: '1px solid var(--line)' }}>
+                        <h5 style={{ fontSize: '12px', fontWeight: '700', color: 'var(--dark)', margin: '0 0 4px 0' }}>Fiddle Leaf Fig Fig Asset</h5>
+                        <p style={{ fontSize: '11px', color: '#666', margin: 0, lineHeight: '1.4' }}>
+                          Presented in a premium fluted ceramic planter pot filled with damp potting soil and boasting broad, organic glossy green leaves. A fixed luxury visual asset.
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
                 </div>
               )}
             </div>

@@ -282,10 +282,10 @@ function DraggableItem({ item, index, isSelected, onSelect, onMove, scaleRange }
       onPointerUp={handlePointerUp}
     >
       {/* Furniture visual component */}
-      {item.type === 'sofa' && <Sofa color={item.color} />}
-      {item.type === 'bed' && <Bed color={item.color} />}
-      {item.type === 'table' && <Table color={item.color} />}
-      {item.type === 'lamp' && <Lamp color={item.color} />}
+      {item.type === 'sofa' && <Sofa color={item.color} material={item.material} />}
+      {item.type === 'bed' && <Bed color={item.color} material={item.material} />}
+      {item.type === 'table' && <Table color={item.color} material={item.material} />}
+      {item.type === 'lamp' && <Lamp color={item.color} material={item.material} />}
       {item.type === 'plant' && <Plant />}
       {item.type === 'art' && <Art color={item.color} />}
 

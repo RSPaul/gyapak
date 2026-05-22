@@ -63,6 +63,142 @@ function useLinenTexture() {
   }, []);
 }
 
+// Helper to generate a loopy wool bouclé bump texture
+function useBoucleTexture() {
+  return useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    // Neutral bump base
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, 256, 256);
+    
+    // Draw organic overlapping yarn loops
+    ctx.strokeStyle = '#9e9e9e';
+    ctx.lineWidth = 1.0;
+    ctx.globalAlpha = 0.22;
+    for (let i = 0; i < 4000; i++) {
+      ctx.beginPath();
+      const x = Math.random() * 256;
+      const y = Math.random() * 256;
+      const r = 2.2 + Math.random() * 3.8;
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.stroke();
+    }
+
+    // Add smaller highlight spots
+    ctx.strokeStyle = '#cccccc';
+    ctx.globalAlpha = 0.16;
+    for (let i = 0; i < 2500; i++) {
+      ctx.beginPath();
+      const x = Math.random() * 256;
+      const y = Math.random() * 256;
+      const r = 1.2 + Math.random() * 2.2;
+      ctx.arc(x, y, r, 0, Math.PI);
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(5, 5);
+    return tex;
+  }, []);
+}
+
+// Helper to generate ribbed corduroy wales bump texture
+function useCorduroyTexture() {
+  return useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 128;
+    canvas.height = 128;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, 128, 128);
+    
+    // Draw vertical parallel ribs
+    const w = 8; 
+    for (let x = 0; x < 128; x += w) {
+      const grad = ctx.createLinearGradient(x, 0, x + w, 0);
+      grad.addColorStop(0, '#555555');
+      grad.addColorStop(0.3, '#aaaaaa');
+      grad.addColorStop(0.5, '#cccccc');
+      grad.addColorStop(0.7, '#aaaaaa');
+      grad.addColorStop(1, '#555555');
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, 0, w, 128);
+    }
+    
+    // Add fine weave threads
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 0.5;
+    ctx.globalAlpha = 0.12;
+    for (let y = 0; y < 128; y += 2) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(128, y);
+      ctx.stroke();
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(4, 4);
+    return tex;
+  }, []);
+}
+
+// Helper to generate organic leather pores & creases bump texture
+function useLeatherTexture() {
+  return useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, 256, 256);
+    
+    // Draw cellular crack network
+    ctx.strokeStyle = '#4e4e4e';
+    ctx.lineWidth = 1.0;
+    ctx.globalAlpha = 0.20;
+    for (let i = 0; i < 45; i++) {
+      ctx.beginPath();
+      let x = Math.random() * 256;
+      let y = Math.random() * 256;
+      ctx.moveTo(x, y);
+      for (let j = 0; j < 6; j++) {
+        x += (Math.random() - 0.5) * 35;
+        y += (Math.random() - 0.5) * 35;
+        ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+
+    // Add fine leather pores
+    ctx.fillStyle = '#444444';
+    ctx.globalAlpha = 0.14;
+    for (let i = 0; i < 8000; i++) {
+      ctx.fillRect(Math.random() * 256, Math.random() * 256, 1.2, 1.2);
+    }
+    ctx.fillStyle = '#ffffff';
+    ctx.globalAlpha = 0.1;
+    for (let i = 0; i < 4000; i++) {
+      ctx.fillRect(Math.random() * 256, Math.random() * 256, 1, 1);
+    }
+
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(3, 3);
+    return tex;
+  }, []);
+}
+
 // Helper to generate elegant polished white Carrara marble texture for tables
 function useMarbleTexture() {
   return useMemo(() => {
@@ -174,9 +310,81 @@ function useTravertineTexture() {
   }, []);
 }
 
+// Helper to generate horizontal brushed metal bump map for bronze
+function useBronzeTexture() {
+  return useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    ctx.fillStyle = '#808080';
+    ctx.fillRect(0, 0, 256, 256);
+    
+    // Horizontal brushed lines
+    ctx.strokeStyle = '#8e8e8e';
+    ctx.lineWidth = 0.8;
+    for (let i = 0; i < 150; i++) {
+      ctx.beginPath();
+      ctx.globalAlpha = 0.08 + Math.random() * 0.12;
+      const y = Math.random() * 256;
+      ctx.moveTo(0, y);
+      ctx.lineTo(256, y + (Math.random() - 0.5) * 1.5);
+      ctx.stroke();
+    }
+    
+    const tex = new THREE.CanvasTexture(canvas);
+    tex.wrapS = THREE.RepeatWrapping;
+    tex.wrapT = THREE.RepeatWrapping;
+    tex.repeat.set(2, 2);
+    return tex;
+  }, []);
+}
+
 // Procedural Sofa - Luxury Mid-Century Modern Tufted Sofa
-export function Sofa({ color }) {
+export function Sofa({ color, material = 'linen' }) {
   const linenBumpMap = useLinenTexture();
+  const boucleBumpMap = useBoucleTexture();
+  const corduroyBumpMap = useCorduroyTexture();
+  const leatherBumpMap = useLeatherTexture();
+
+  const matProps = useMemo(() => {
+    switch (material) {
+      case 'boucle':
+        return {
+          color: color,
+          bumpMap: boucleBumpMap,
+          bumpScale: 0.022,
+          roughness: 0.94,
+          metalness: 0.02
+        };
+      case 'corduroy':
+        return {
+          color: color,
+          bumpMap: corduroyBumpMap,
+          bumpScale: 0.018,
+          roughness: 0.88,
+          metalness: 0.01
+        };
+      case 'leather':
+        return {
+          color: color,
+          bumpMap: leatherBumpMap,
+          bumpScale: 0.007,
+          roughness: 0.36,
+          metalness: 0.12
+        };
+      case 'linen':
+      default:
+        return {
+          color: color,
+          bumpMap: linenBumpMap,
+          bumpScale: 0.016,
+          roughness: 0.8,
+          metalness: 0.02
+        };
+    }
+  }, [material, color, linenBumpMap, boucleBumpMap, corduroyBumpMap, leatherBumpMap]);
 
   return (
     <group>
@@ -196,12 +404,7 @@ export function Sofa({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.016} 
-          roughness={0.8} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
       {/* Right Cushion */}
       <RoundedBox 
@@ -212,12 +415,7 @@ export function Sofa({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.016} 
-          roughness={0.8} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
 
       {/* Sofa Backrest shell */}
@@ -229,12 +427,7 @@ export function Sofa({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.016} 
-          roughness={0.8} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
 
       {/* Sleek Curved Armrests */}
@@ -247,12 +440,7 @@ export function Sofa({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.016} 
-          roughness={0.8} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
       {/* Right Armrest */}
       <RoundedBox 
@@ -263,12 +451,7 @@ export function Sofa({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.016} 
-          roughness={0.8} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
 
       {/* Decorative Back Pillows with Realistic Deep 3D Button Tufting */}
@@ -282,12 +465,7 @@ export function Sofa({ color }) {
           rotation={[0.06, 0.03, 0]}
           castShadow
         >
-          <meshStandardMaterial 
-            color={color} 
-            bumpMap={linenBumpMap} 
-            bumpScale={0.02} 
-            roughness={0.85} 
-          />
+          <meshStandardMaterial {...matProps} />
         </RoundedBox>
         {/* Recessed Button Tufts - Row 1 & 2 */}
         {[-0.32, -0.12, 0.12, 0.32].map((bx) => 
@@ -315,12 +493,7 @@ export function Sofa({ color }) {
           rotation={[0.06, -0.03, 0]}
           castShadow
         >
-          <meshStandardMaterial 
-            color={color} 
-            bumpMap={linenBumpMap} 
-            bumpScale={0.02} 
-            roughness={0.85} 
-          />
+          <meshStandardMaterial {...matProps} />
         </RoundedBox>
         {/* Recessed Button Tufts - Row 1 & 2 */}
         {[-0.32, -0.12, 0.12, 0.32].map((bx) => 
@@ -350,9 +523,9 @@ export function Sofa({ color }) {
       >
         <meshStandardMaterial 
           color="#a94f36" // Designer Terracotta Accent
-          bumpMap={linenBumpMap} 
-          bumpScale={0.02} 
-          roughness={0.8} 
+          bumpMap={matProps.bumpMap} 
+          bumpScale={matProps.bumpScale} 
+          roughness={matProps.roughness} 
         />
       </RoundedBox>
 
@@ -367,9 +540,9 @@ export function Sofa({ color }) {
       >
         <meshStandardMaterial 
           color="#b88a44" // Designer Gold Accent
-          bumpMap={linenBumpMap} 
-          bumpScale={0.02} 
-          roughness={0.8} 
+          bumpMap={matProps.bumpMap} 
+          bumpScale={matProps.bumpScale} 
+          roughness={matProps.roughness} 
         />
       </RoundedBox>
 
@@ -406,8 +579,49 @@ export function Sofa({ color }) {
 }
 
 // Procedural Bed - Luxury Hotel Platform Bed with Channel-Tufted Headboard
-export function Bed({ color }) {
+export function Bed({ color, material = 'linen' }) {
   const linenBumpMap = useLinenTexture();
+  const boucleBumpMap = useBoucleTexture();
+  const corduroyBumpMap = useCorduroyTexture();
+  const leatherBumpMap = useLeatherTexture();
+
+  const matProps = useMemo(() => {
+    switch (material) {
+      case 'boucle':
+        return {
+          color: color,
+          bumpMap: boucleBumpMap,
+          bumpScale: 0.022,
+          roughness: 0.94,
+          metalness: 0.02
+        };
+      case 'corduroy':
+        return {
+          color: color,
+          bumpMap: corduroyBumpMap,
+          bumpScale: 0.018,
+          roughness: 0.88,
+          metalness: 0.01
+        };
+      case 'leather':
+        return {
+          color: color,
+          bumpMap: leatherBumpMap,
+          bumpScale: 0.007,
+          roughness: 0.36,
+          metalness: 0.12
+        };
+      case 'linen':
+      default:
+        return {
+          color: color,
+          bumpMap: linenBumpMap,
+          bumpScale: 0.016,
+          roughness: 0.8,
+          metalness: 0.02
+        };
+    }
+  }, [material, color, linenBumpMap, boucleBumpMap, corduroyBumpMap, leatherBumpMap]);
 
   return (
     <group>
@@ -430,12 +644,7 @@ export function Bed({ color }) {
             castShadow
             receiveShadow
           >
-            <meshStandardMaterial 
-              color="#3c3732" 
-              bumpMap={linenBumpMap} 
-              bumpScale={0.018} 
-              roughness={0.88} 
-            />
+            <meshStandardMaterial {...matProps} />
           </RoundedBox>
         ))}
 
@@ -512,9 +721,9 @@ export function Bed({ color }) {
       >
         <meshStandardMaterial 
           color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.02} 
-          roughness={0.8} 
+          bumpMap={matProps.bumpMap} 
+          bumpScale={matProps.bumpScale} 
+          roughness={matProps.roughness} 
         />
       </RoundedBox>
       <RoundedBox 
@@ -527,9 +736,9 @@ export function Bed({ color }) {
       >
         <meshStandardMaterial 
           color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.02} 
-          roughness={0.8} 
+          bumpMap={matProps.bumpMap} 
+          bumpScale={matProps.bumpScale} 
+          roughness={matProps.roughness} 
         />
       </RoundedBox>
 
@@ -548,12 +757,7 @@ export function Bed({ color }) {
         castShadow 
         receiveShadow
       >
-        <meshStandardMaterial 
-          color={color} 
-          bumpMap={linenBumpMap} 
-          bumpScale={0.025} 
-          roughness={0.82} 
-        />
+        <meshStandardMaterial {...matProps} />
       </RoundedBox>
 
       {/* Organic Blanket creases/folds (3D cylinder ripples catching shadows) */}
@@ -573,19 +777,60 @@ export function Bed({ color }) {
 }
 
 // Procedural Table - Luxury White Carrara Marble Table with Decorative Centerpiece
-export function Table({ color }) {
+export function Table({ color, material = 'marble' }) {
   const marbleTex = useMarbleTexture();
+  const travertineTex = useTravertineTexture();
+  const bronzeBumpMap = useBronzeTexture();
+  const linenBumpMap = useLinenTexture(); // Serves as organic wood grain bump
+
+  const matProps = useMemo(() => {
+    switch (material) {
+      case 'travertine':
+        return {
+          map: travertineTex,
+          color: '#ebdcc8',
+          roughness: 0.65,
+          metalness: 0.08,
+          bumpMap: null,
+          bumpScale: 0
+        };
+      case 'bronze':
+        return {
+          map: null,
+          color: color || '#8a7254',
+          roughness: 0.28,
+          metalness: 0.95,
+          bumpMap: bronzeBumpMap,
+          bumpScale: 0.008
+        };
+      case 'wood':
+        return {
+          map: null,
+          color: color || '#5c3a21', // Dark luxury walnut
+          roughness: 0.55,
+          metalness: 0.05,
+          bumpMap: linenBumpMap,
+          bumpScale: 0.012
+        };
+      case 'marble':
+      default:
+        return {
+          map: marbleTex,
+          color: '#faf9f6',
+          roughness: 0.04,
+          metalness: 0.05,
+          bumpMap: null,
+          bumpScale: 0
+        };
+    }
+  }, [material, color, marbleTex, travertineTex, bronzeBumpMap, linenBumpMap]);
 
   return (
     <group>
       {/* Solid Luxury Carrara Marble Top with Beveled Edge */}
       <mesh position={[0, 0.73, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.65, 0.65, 0.04, 64]} />
-        <meshStandardMaterial 
-          map={marbleTex}
-          roughness={0.04} // Highly reflective specular highlight
-          metalness={0.05} 
-        />
+        <meshStandardMaterial {...matProps} />
       </mesh>
       
       {/* Thin Gold Metal Underplate Support */}
@@ -662,15 +907,59 @@ export function Table({ color }) {
 }
 
 // Procedural Floor Lamp - Travertine & Curved Brass Architectural Lamp
-export function Lamp({ color }) {
+export function Lamp({ color, material = 'travertine' }) {
   const travertineTex = useTravertineTexture();
+  const marbleTex = useMarbleTexture();
+  const bronzeBumpMap = useBronzeTexture();
+
+  const baseProps = useMemo(() => {
+    switch (material) {
+      case 'marble':
+        return {
+          map: marbleTex,
+          color: '#faf9f6',
+          roughness: 0.05,
+          metalness: 0.05,
+          bumpMap: null,
+          bumpScale: 0
+        };
+      case 'bronze':
+        return {
+          map: null,
+          color: color || '#8a7254',
+          roughness: 0.25,
+          metalness: 0.95,
+          bumpMap: bronzeBumpMap,
+          bumpScale: 0.01
+        };
+      case 'ceramic':
+        return {
+          map: null,
+          color: color || '#3c5a5a', // Glossy crackle ceramic
+          roughness: 0.08,
+          metalness: 0.1,
+          bumpMap: null,
+          bumpScale: 0
+        };
+      case 'travertine':
+      default:
+        return {
+          map: travertineTex,
+          color: '#ebe0d0',
+          roughness: 0.65,
+          metalness: 0.05,
+          bumpMap: null,
+          bumpScale: 0
+        };
+    }
+  }, [material, color, travertineTex, marbleTex, bronzeBumpMap]);
 
   return (
     <group>
       {/* Solid Travertine Stone Heavy Base */}
       <mesh position={[0, 0.08, 0]} castShadow receiveShadow>
         <cylinderGeometry args={[0.16, 0.16, 0.16, 24]} />
-        <meshStandardMaterial color="#ebe0d0" map={travertineTex} roughness={0.65} />
+        <meshStandardMaterial {...baseProps} />
       </mesh>
       
       {/* Gold Brass Collar Ring on base */}
