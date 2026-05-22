@@ -1,9 +1,199 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ContactShadows } from '@react-three/drei';
+import { ContactShadows, Html } from '@react-three/drei';
 import { Sofa, Bed, Table, Lamp, Plant, Art } from './FurnitureModels';
 import PerspectiveGrid from './PerspectiveGrid';
+
+// Real-world reference dimensions in millimeters (at 100% scale)
+const FURNITURE_SPECS = {
+  sofa: { w: 2.22, d: 0.92, h: 0.72, wMm: 2200, dMm: 920, hMm: 720 },
+  bed: { w: 2.0, d: 2.1, h: 1.1, wMm: 2000, dMm: 2100, hMm: 1100 },
+  table: { w: 1.4, d: 0.8, h: 0.75, wMm: 1400, dMm: 800, hMm: 750 },
+  lamp: { w: 0.45, d: 0.45, h: 1.8, wMm: 450, dMm: 450, hMm: 1800 },
+  plant: { w: 0.6, d: 0.6, h: 1.4, wMm: 600, dMm: 600, hMm: 1400 },
+  art: { w: 0.9, d: 0.04, h: 1.2, wMm: 900, dMm: 40, hMm: 1200 }
+};
+
+// Champagne Gold CAD-Style Dimension Overlay Component
+function DimensionOverlay({ type, itemScale }) {
+  const spec = FURNITURE_SPECS[type];
+  if (!spec) return null;
+
+  const { w, d, h, wMm, dMm, hMm } = spec;
+
+  // Projection offsets for clean CAD styling
+  const offset = 0.22; // Distance of dimension lines from the furniture boundary (22cm)
+  const extLen = 0.28; // Length of thin extension lines (28cm)
+  
+  // Real-time scaled dimensions in millimeters
+  const currentWidth = Math.round(wMm * itemScale);
+  const currentDepth = Math.round(dMm * itemScale);
+  const currentHeight = Math.round(hMm * itemScale);
+
+  return (
+    <group>
+      {/* 1. WIDTH OVERLAY (Front bottom along X-axis) */}
+      <group position={[0, 0.01, d / 2 + offset]}>
+        {/* Main Dimension Line */}
+        <mesh>
+          <boxGeometry args={[w, 0.005, 0.005]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        
+        {/* End Tick Marks (45-degree CAD ticks) */}
+        <mesh position={[-w / 2, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        <mesh position={[w / 2, 0, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+
+        {/* Floating Millimeter Label */}
+        <Html position={[0, 0.12, 0.04]} center distanceFactor={6}>
+          <div style={{
+            background: 'rgba(15, 15, 15, 0.92)',
+            border: '1px solid #c5a880',
+            color: '#fdfdfd',
+            borderRadius: '4px',
+            padding: '3px 8px',
+            fontSize: '11px',
+            fontWeight: '600',
+            fontFamily: '"Outfit", "Inter", sans-serif',
+            letterSpacing: '0.08em',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <span style={{ color: '#c5a880', fontSize: '9px', fontWeight: '400' }}>W:</span>
+            {currentWidth}mm
+          </div>
+        </Html>
+      </group>
+      
+      {/* Width Extension Lines */}
+      <mesh position={[-w / 2, 0.01, d / 2 + extLen / 2]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[0.003, 0.003, extLen]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+      <mesh position={[w / 2, 0.01, d / 2 + extLen / 2]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[0.003, 0.003, extLen]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+
+      {/* 2. DEPTH OVERLAY (Right bottom along Z-axis) */}
+      <group position={[w / 2 + offset, 0.01, 0]}>
+        {/* Main Dimension Line */}
+        <mesh rotation={[0, Math.PI / 2, 0]}>
+          <boxGeometry args={[d, 0.005, 0.005]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        
+        {/* End Tick Marks (45-degree CAD ticks) */}
+        <mesh position={[0, 0, -d / 2]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        <mesh position={[0, 0, d / 2]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+
+        {/* Floating Millimeter Label */}
+        <Html position={[0.04, 0.12, 0]} center distanceFactor={6}>
+          <div style={{
+            background: 'rgba(15, 15, 15, 0.92)',
+            border: '1px solid #c5a880',
+            color: '#fdfdfd',
+            borderRadius: '4px',
+            padding: '3px 8px',
+            fontSize: '11px',
+            fontWeight: '600',
+            fontFamily: '"Outfit", "Inter", sans-serif',
+            letterSpacing: '0.08em',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <span style={{ color: '#c5a880', fontSize: '9px', fontWeight: '400' }}>D:</span>
+            {currentDepth}mm
+          </div>
+        </Html>
+      </group>
+
+      {/* Depth Extension Lines */}
+      <mesh position={[w / 2 + extLen / 2, 0.01, -d / 2]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[0.003, 0.003, extLen]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+      <mesh position={[w / 2 + extLen / 2, 0.01, d / 2]} rotation={[0, Math.PI / 2, 0]}>
+        <boxGeometry args={[0.003, 0.003, extLen]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+
+      {/* 3. HEIGHT OVERLAY (Vertical along Y-axis, placed at back-left corner) */}
+      <group position={[-w / 2 - offset, h / 2, -d / 2]}>
+        {/* Main Dimension Line */}
+        <mesh rotation={[0, 0, Math.PI / 2]}>
+          <boxGeometry args={[h, 0.005, 0.005]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        
+        {/* End Tick Marks (45-degree CAD ticks) */}
+        <mesh position={[0, -h / 2, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+        <mesh position={[0, h / 2, 0]} rotation={[0, 0, Math.PI / 4]}>
+          <boxGeometry args={[0.08, 0.008, 0.008]} />
+          <meshBasicMaterial color="#d4af37" />
+        </mesh>
+
+        {/* Floating Millimeter Label */}
+        <Html position={[-0.04, 0, 0]} center distanceFactor={6}>
+          <div style={{
+            background: 'rgba(15, 15, 15, 0.92)',
+            border: '1px solid #c5a880',
+            color: '#fdfdfd',
+            borderRadius: '4px',
+            padding: '3px 8px',
+            fontSize: '11px',
+            fontWeight: '600',
+            fontFamily: '"Outfit", "Inter", sans-serif',
+            letterSpacing: '0.08em',
+            whiteSpace: 'nowrap',
+            pointerEvents: 'none',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.6)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '4px'
+          }}>
+            <span style={{ color: '#c5a880', fontSize: '9px', fontWeight: '400' }}>H:</span>
+            {currentHeight}mm
+          </div>
+        </Html>
+      </group>
+
+      {/* Height Extension Lines */}
+      <mesh position={[-w / 2 - extLen / 2, 0, -d / 2]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[extLen, 0.003, 0.003]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+      <mesh position={[-w / 2 - extLen / 2, h, -d / 2]} rotation={[0, 0, 0]}>
+        <boxGeometry args={[extLen, 0.003, 0.003]} />
+        <meshBasicMaterial color="#c5a880" transparent opacity={0.5} />
+      </mesh>
+    </group>
+  );
+}
 
 // Camera Manager updates the Three.js camera based on perspective calibration parameters
 function CameraManager({ calibration }) {
@@ -75,6 +265,11 @@ function DraggableItem({ item, index, isSelected, onSelect, onMove, scaleRange }
 
   // Scale calculations
   const scale = (item.scale || 100) / 100;
+  
+  // Get furniture specs for bounds sizing
+  const spec = FURNITURE_SPECS[item.type];
+  const boundingWidth = spec ? spec.w : 2.0;
+  const boundingDepth = spec ? spec.d : 1.0;
 
   return (
     <group
@@ -94,13 +289,24 @@ function DraggableItem({ item, index, isSelected, onSelect, onMove, scaleRange }
       {item.type === 'plant' && <Plant />}
       {item.type === 'art' && <Art color={item.color} />}
 
-      {/* Selected Indicator Outline Ring */}
+      {/* Selected Indicator Outline Ring (scaled to fit bounding bounds!) */}
       {isSelected && (
         <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, 0.01, 0]}>
-          <ringGeometry args={[1.0, 1.05, 32]} />
-          <meshBasicMaterial color="#a94f36" side={THREE.DoubleSide} />
+          <ringGeometry args={[boundingWidth / 2 + 0.05, boundingWidth / 2 + 0.08, 32]} />
+          <meshBasicMaterial color="#d4af37" side={THREE.DoubleSide} />
         </mesh>
       )}
+
+      {/* Selected Indicator Depth Outline Ring (for double-cross overlay) */}
+      {isSelected && (
+        <mesh rotation={[-Math.PI / 2, 0, Math.PI / 2]} position={[0, 0.01, 0]}>
+          <ringGeometry args={[boundingDepth / 2 + 0.05, boundingDepth / 2 + 0.08, 32]} />
+          <meshBasicMaterial color="#d4af37" side={THREE.DoubleSide} />
+        </mesh>
+      )}
+
+      {/* CAD-Style Dimension Overlay */}
+      {isSelected && <DimensionOverlay type={item.type} itemScale={scale} />}
     </group>
   );
 }
