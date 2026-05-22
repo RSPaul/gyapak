@@ -4,10 +4,10 @@ import DesignerCanvas from '../components/DesignerCanvas';
 
 // Default room background options
 const templates = [
-  { id: 'living', name: 'Living Room', url: '/assets/images/gyapak-living-room.png' },
-  { id: 'bedroom', name: 'Bedroom', url: '/assets/images/gyapak-bedroom.png' },
-  { id: 'kitchen', name: 'Kitchen', url: '/assets/images/gyapak-kitchen.png' },
-  { id: 'office', name: 'Home Office', url: '/assets/images/gyapak-office.png' }
+  { id: 'living', name: 'Living Room', url: '/assets/images/gyapak-living-room-before.png' },
+  { id: 'bedroom', name: 'Bedroom', url: '/assets/images/gyapak-bedroom-before.png' },
+  { id: 'kitchen', name: 'Kitchen', url: '/assets/images/gyapak-kitchen-before.png' },
+  { id: 'office', name: 'Home Office', url: '/assets/images/gyapak-office-before.png' }
 ];
 
 // Color Swatches
@@ -25,6 +25,9 @@ const furnitureDefaults = {
   sofa: { color: '#315f73', scale: 100, rotation: 0, material: 'linen' },
   bed: { color: '#d9cab8', scale: 100, rotation: 0, material: 'linen' },
   table: { color: '#8b5b3d', scale: 100, rotation: 0, material: 'marble' },
+  chair: { color: '#2e3d30', scale: 100, rotation: 0, material: 'leather' },
+  tv: { color: '#1a1a1a', scale: 100, rotation: 0, material: 'none' },
+  laptop: { color: '#b08d57', scale: 100, rotation: 0, material: 'none' },
   lamp: { color: '#b88a44', scale: 100, rotation: 0, material: 'travertine' },
   plant: { color: '#28634f', scale: 100, rotation: 0, material: 'none' },
   art: { color: '#a94f36', scale: 100, rotation: 0, material: 'none' }
@@ -87,7 +90,7 @@ export default function DesignYourself() {
   
   // Lighting and Calibration states
   const [lighting, setLighting] = useState('warm');
-  const [gridVisible, setGridVisible] = useState(true);
+  const [gridVisible, setGridVisible] = useState(false);
   const [calibration, setCalibration] = useState({
     pitch: 20,
     roll: 0,
@@ -341,6 +344,9 @@ export default function DesignYourself() {
       sofa: { w: 2200, d: 920, h: 720, name: 'Emerald Sofa', defaultMat: 'Slub Linen' },
       bed: { w: 2100, d: 2000, h: 1100, name: 'Deluxe Platform Bed', defaultMat: 'Slub Linen' },
       table: { w: 1300, d: 1300, h: 750, name: 'Carrara Bistro Table', defaultMat: 'Carrara Marble' },
+      chair: { w: 650, d: 650, h: 950, name: 'Ergonomic Desk Chair', defaultMat: 'Saddle Leather' },
+      tv: { w: 1200, d: 220, h: 800, name: 'Smart TV Console Display', defaultMat: 'Matte Obsidian' },
+      laptop: { w: 350, d: 250, h: 220, name: 'Aluminium Ultrabook', defaultMat: 'Anodized Chassis' },
       lamp: { w: 450, d: 450, h: 1850, name: 'Arc Floor Lamp', defaultMat: 'Travertine Stone' },
       plant: { w: 800, d: 800, h: 1600, name: 'Fiddle Leaf Fig Pot', defaultMat: 'Fluted Ceramic Planter' },
       art: { w: 1200, d: 80, h: 900, name: 'Minimalist Gallery Art', defaultMat: 'Walnut Framing' }
@@ -896,7 +902,10 @@ export default function DesignYourself() {
                 {[
                   { id: 'sofa', name: 'Emerald Sofa', desc: 'Mid-Century Tufted', thumb: '/assets/images/thumb-sofa.png' },
                   { id: 'bed', name: 'Deluxe Bed', desc: 'Hotel Wingback Platform', thumb: '/assets/images/thumb-bed.png' },
-                  { id: 'table', name: 'Carrara Table', desc: 'Polished Marble Top', thumb: '/assets/images/thumb-table.png' },
+                  { id: 'table', name: 'Carrara Table', desc: 'Polished Rounded Square Marble', thumb: '/assets/images/thumb-table.png' },
+                  { id: 'chair', name: 'Office Chair', desc: 'Ergonomic Premium Desk Chair', thumb: '/assets/images/thumb-chair.png' },
+                  { id: 'tv', name: 'Smart TV', desc: 'Sleek Widescreen 4K Display', thumb: '/assets/images/thumb-tv.png' },
+                  { id: 'laptop', name: 'Designer Laptop', desc: 'Sleek Aluminium Ultrabook', thumb: '/assets/images/thumb-laptop.png' },
                   { id: 'lamp', name: 'Arc Lamp', desc: 'Travertine & Brass', thumb: '/assets/images/thumb-lamp.png' },
                   { id: 'plant', name: 'Fiddle Leaf Fig', desc: 'Fluted Ceramic Pot', thumb: '/assets/images/thumb-plant.png' },
                   { id: 'art', name: 'Floating Art', desc: 'Canvas in Walnut Frame', thumb: '/assets/images/thumb-art.png' }
@@ -999,7 +1008,7 @@ export default function DesignYourself() {
                   </div>
 
                   {/* 2. Premium Tactile Finishes & Customizer */}
-                  {(activeItem.type === 'sofa' || activeItem.type === 'bed') && (
+                  {(activeItem.type === 'sofa' || activeItem.type === 'bed' || activeItem.type === 'chair') && (
                     <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
                       <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Select Upholstery Fabric</span>
                       
@@ -1067,7 +1076,7 @@ export default function DesignYourself() {
                     </div>
                   )}
 
-                  {(activeItem.type === 'table' || activeItem.type === 'lamp') && (
+                  {(activeItem.type === 'table' || activeItem.type === 'lamp' || activeItem.type === 'tv' || activeItem.type === 'laptop') && (
                     <div style={{ display: 'grid', gap: '12px', borderTop: '1px solid var(--line)', paddingTop: '12px' }}>
                       <span style={{ fontSize: '11px', fontWeight: '800', color: 'var(--muted)', letterSpacing: '0.05em', textTransform: 'uppercase' }}>2. Select Hard Surface Material</span>
                       
@@ -1268,11 +1277,11 @@ export default function DesignYourself() {
                   onTouchMove={handleTouchMove}
                   onTouchEnd={handleTouchEnd}
                 >
-                  <svg style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
+                  <svg viewBox="0 0 1200 760" preserveAspectRatio="none" style={{ width: '100%', height: '100%', position: 'absolute', inset: 0 }}>
                     {/* Drag selection draft box preview */}
                     {wallDraft.length === 4 && (
                       <polygon
-                        points={wallDraft.map(p => `${(p.x/1200)*100}%,${(p.y/760)*100}%`).join(' ')}
+                        points={wallDraft.map(p => `${p.x},${p.y}`).join(' ')}
                         fill="var(--rust)"
                         fillOpacity="0.15"
                         stroke="var(--rust)"
@@ -1285,7 +1294,7 @@ export default function DesignYourself() {
                     {/* Finalized wall outline visualization */}
                     {wallShape.length > 0 && (
                       <polygon
-                        points={wallShape.map(p => `${(p.x/1200)*100}%,${(p.y/760)*100}%`).join(' ')}
+                        points={wallShape.map(p => `${p.x},${p.y}`).join(' ')}
                         fill={wallColor}
                         fillOpacity="0.34"
                         stroke="var(--gold)"

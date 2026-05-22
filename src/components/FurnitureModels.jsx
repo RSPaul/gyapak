@@ -828,16 +828,14 @@ export function Table({ color, material = 'marble' }) {
   return (
     <group>
       {/* Solid Luxury Carrara Marble Top with Beveled Edge */}
-      <mesh position={[0, 0.73, 0]} castShadow receiveShadow>
-        <cylinderGeometry args={[0.65, 0.65, 0.04, 64]} />
+      <RoundedBox args={[1.3, 0.04, 1.3]} radius={0.02} smoothness={4} position={[0, 0.73, 0]} castShadow receiveShadow>
         <meshStandardMaterial {...matProps} />
-      </mesh>
+      </RoundedBox>
       
       {/* Thin Gold Metal Underplate Support */}
-      <mesh position={[0, 0.70, 0]} receiveShadow>
-        <cylinderGeometry args={[0.62, 0.62, 0.02, 32]} />
+      <RoundedBox args={[1.22, 0.02, 1.22]} radius={0.015} smoothness={4} position={[0, 0.70, 0]} receiveShadow>
         <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.12} />
-      </mesh>
+      </RoundedBox>
 
       {/* Sleek Heavy Fluted Pedestal Column Support */}
       <mesh position={[0, 0.35, 0]} castShadow>
@@ -1214,10 +1212,333 @@ export function Art({ color }) {
         <planeGeometry args={[0.92, 0.92]} />
         <meshStandardMaterial 
           map={paintingTexture} 
-          roughness={0.6} // Semi-matte oil canvas reflection
-          metalness={0.05} 
         />
       </mesh>
+    </group>
+  );
+}
+
+// Procedural Chair - Premium Ergonomic Office Desk Chair
+export function Chair({ color, material = 'leather' }) {
+  const linenBumpMap = useLinenTexture();
+  const boucleBumpMap = useBoucleTexture();
+  const corduroyBumpMap = useCorduroyTexture();
+  const leatherBumpMap = useLeatherTexture();
+
+  const matProps = useMemo(() => {
+    switch (material) {
+      case 'boucle':
+        return {
+          color: color || '#2e3d30',
+          bumpMap: boucleBumpMap,
+          bumpScale: 0.022,
+          roughness: 0.94,
+          metalness: 0.02
+        };
+      case 'corduroy':
+        return {
+          color: color || '#2e3d30',
+          bumpMap: corduroyBumpMap,
+          bumpScale: 0.018,
+          roughness: 0.88,
+          metalness: 0.01
+        };
+      case 'leather':
+        return {
+          color: color || '#2e3d30',
+          bumpMap: leatherBumpMap,
+          bumpScale: 0.007,
+          roughness: 0.36,
+          metalness: 0.12
+        };
+      case 'linen':
+      default:
+        return {
+          color: color || '#2e3d30',
+          bumpMap: linenBumpMap,
+          bumpScale: 0.016,
+          roughness: 0.8,
+          metalness: 0.02
+        };
+    }
+  }, [material, color, linenBumpMap, boucleBumpMap, corduroyBumpMap, leatherBumpMap]);
+
+  return (
+    <group>
+      {/* 5-Spoke Star Base with Wheels */}
+      <group position={[0, 0.08, 0]}>
+        {/* Hub */}
+        <mesh castShadow receiveShadow>
+          <cylinderGeometry args={[0.08, 0.09, 0.06, 12]} />
+          <meshStandardMaterial color="#1f1f1f" metalness={0.88} roughness={0.2} />
+        </mesh>
+        
+        {/* Spoke rods */}
+        {[0, 72, 144, 216, 288].map((angle, idx) => {
+          const rad = (angle * Math.PI) / 180;
+          return (
+            <group key={idx} rotation={[0, rad, 0]}>
+              {/* Spoke arm */}
+              <mesh position={[0.2, 0, 0]} castShadow>
+                <boxGeometry args={[0.36, 0.03, 0.04]} />
+                <meshStandardMaterial color="#1a1a1a" metalness={0.9} roughness={0.15} />
+              </mesh>
+              {/* Gold Spoke Trim */}
+              <mesh position={[0.2, 0.018, 0]}>
+                <boxGeometry args={[0.3, 0.005, 0.015]} />
+                <meshStandardMaterial color="#d4af37" metalness={0.9} roughness={0.1} />
+              </mesh>
+              {/* Wheel/Caster */}
+              <mesh position={[0.34, -0.04, 0]} rotation={[Math.PI / 2, 0, 0]} castShadow>
+                <cylinderGeometry args={[0.035, 0.035, 0.02, 12]} />
+                <meshStandardMaterial color="#0b0b0b" roughness={0.8} />
+              </mesh>
+            </group>
+          );
+        })}
+      </group>
+
+      {/* Hydraulic Gas Lift Stem */}
+      <mesh position={[0, 0.22, 0]} castShadow>
+        <cylinderGeometry args={[0.028, 0.032, 0.22, 12]} />
+        <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.12} />
+      </mesh>
+      <mesh position={[0, 0.32, 0]}>
+        <cylinderGeometry args={[0.022, 0.022, 0.12, 12]} />
+        <meshStandardMaterial color="#111111" metalness={0.8} roughness={0.2} />
+      </mesh>
+
+      {/* Seat Under-bracket Support */}
+      <mesh position={[0, 0.39, 0]} castShadow>
+        <boxGeometry args={[0.22, 0.04, 0.24]} />
+        <meshStandardMaterial color="#2d2d2d" metalness={0.8} roughness={0.3} />
+      </mesh>
+
+      {/* Seat Cushion */}
+      <RoundedBox args={[0.54, 0.07, 0.52]} radius={0.02} smoothness={4} position={[0, 0.44, 0]} castShadow receiveShadow>
+        <meshStandardMaterial {...matProps} />
+      </RoundedBox>
+
+      {/* Ergonomic Curved Backrest */}
+      <group position={[0, 0.76, -0.22]} rotation={[-0.08, 0, 0]}>
+        {/* Support Steel Bar (Concentric back spine) */}
+        <mesh position={[0, -0.2, 0.02]} castShadow>
+          <boxGeometry args={[0.05, 0.4, 0.02]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.12} />
+        </mesh>
+        
+        {/* Upper support bracket */}
+        <mesh position={[0, 0.02, 0.02]}>
+          <boxGeometry args={[0.22, 0.03, 0.02]} />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.8} roughness={0.2} />
+        </mesh>
+
+        {/* Backrest Cushion */}
+        <RoundedBox args={[0.48, 0.48, 0.06]} radius={0.02} smoothness={4} castShadow receiveShadow>
+          <meshStandardMaterial {...matProps} />
+        </RoundedBox>
+
+        {/* Gold Trim Outer Back Shell */}
+        <RoundedBox args={[0.49, 0.49, 0.01]} radius={0.02} smoothness={4} position={[0, 0, -0.032]}>
+          <meshStandardMaterial color="#121212" metalness={0.9} roughness={0.15} />
+        </RoundedBox>
+      </group>
+
+      {/* Slim Modern Armrests */}
+      {[-1, 1].map((side, idx) => (
+        <group key={idx} position={[0.29 * side, 0.54, -0.02]}>
+          {/* Armrest Metal L-bar */}
+          <mesh castShadow>
+            <boxGeometry args={[0.02, 0.22, 0.03]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.12} />
+          </mesh>
+          {/* Horizontal Armrest support */}
+          <mesh position={[0, 0.1, 0.06]} castShadow>
+            <boxGeometry args={[0.02, 0.02, 0.22]} />
+            <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.12} />
+          </mesh>
+          {/* Leather/Padded arm cushion */}
+          <RoundedBox args={[0.045, 0.025, 0.24]} radius={0.008} smoothness={3} position={[0, 0.11, 0.06]} castShadow>
+            <meshStandardMaterial color="#1a1a1a" roughness={0.4} />
+          </RoundedBox>
+        </group>
+      ))}
+    </group>
+  );
+}
+
+// Procedural TV - Sleek frameless 4K Smart TV
+export function TV({ color, material }) {
+  // Let's render a glossy abstract wallpaper for the TV screen
+  const screenTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d');
+    
+    // Sleek dark gradient background
+    const grad = ctx.createLinearGradient(0, 0, 512, 256);
+    grad.addColorStop(0, '#0c0f12');
+    grad.addColorStop(0.5, '#1b232e');
+    grad.addColorStop(1, '#080a0d');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 512, 256);
+
+    // Modern golden abstract waves
+    ctx.globalAlpha = 0.65;
+    ctx.strokeStyle = '#d4af37';
+    ctx.lineWidth = 1.5;
+    for (let i = 0; i < 4; i++) {
+      ctx.beginPath();
+      ctx.moveTo(0, 100 + i * 20);
+      ctx.bezierCurveTo(150, 40 + i * 30, 350, 220 - i * 30, 512, 120 - i * 15);
+      ctx.stroke();
+    }
+    
+    // Add subtle ambient spots
+    ctx.globalAlpha = 0.15;
+    ctx.fillStyle = '#a94f36';
+    ctx.beginPath(); ctx.arc(380, 100, 60, 0, Math.PI * 2); ctx.fill();
+
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
+  return (
+    <group>
+      {/* Sleek low-profile metal stand (rests on table console) */}
+      <group>
+        {/* Foot plate */}
+        <mesh position={[0, 0.005, 0]} castShadow receiveShadow>
+          <boxGeometry args={[0.42, 0.01, 0.18]} />
+          <meshStandardMaterial color="#1a1a1a" metalness={0.92} roughness={0.12} />
+        </mesh>
+        {/* Upright metal neck */}
+        <mesh position={[0, 0.08, -0.04]} castShadow>
+          <boxGeometry args={[0.06, 0.15, 0.03]} />
+          <meshStandardMaterial color="#111" metalness={0.92} roughness={0.12} />
+        </mesh>
+      </group>
+
+      {/* Main TV Frame Screen */}
+      <group position={[0, 0.44, -0.04]}>
+        {/* Frame Outer Bezel */}
+        <RoundedBox args={[1.2, 0.7, 0.035]} radius={0.006} smoothness={3} castShadow receiveShadow>
+          <meshStandardMaterial color="#0f0f10" metalness={0.88} roughness={0.18} />
+        </RoundedBox>
+
+        {/* Back chassis bulge */}
+        <mesh position={[0, 0, -0.024]} castShadow>
+          <boxGeometry args={[1.08, 0.62, 0.02]} />
+          <meshStandardMaterial color="#1c1c1d" roughness={0.5} />
+        </mesh>
+
+        {/* Glowing Gold Bezel Trim Inset (High-end detail) */}
+        <mesh position={[0, 0, 0.018]}>
+          <boxGeometry args={[1.164, 0.664, 0.002]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.1} />
+        </mesh>
+
+        {/* Glossy TV Screen */}
+        <mesh position={[0, 0, 0.019]}>
+          <planeGeometry args={[1.16, 0.66]} />
+          <meshStandardMaterial 
+            map={screenTexture} 
+            roughness={0.08} // Extremely glossy screen reflection
+            metalness={0.1} 
+          />
+        </mesh>
+      </group>
+    </group>
+  );
+}
+
+// Procedural Laptop - Sleek modern open ultrabook
+export function Laptop({ color, material }) {
+  // Clean screen visual showing code or designer mockup
+  const screenTexture = useMemo(() => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 170;
+    const ctx = canvas.getContext('2d');
+    
+    // Charcoal dark editor style
+    ctx.fillStyle = '#1e1e1e';
+    ctx.fillRect(0, 0, 256, 170);
+
+    // Add gold-colored glowing code editor mock
+    ctx.fillStyle = '#d4af37';
+    ctx.font = '8px monospace';
+    ctx.fillText('import { Customizer } from "gyapak";', 12, 22);
+    ctx.fillStyle = '#a94f36';
+    ctx.font = '8px Georgia';
+    ctx.fillText('const StagingScene = () => {', 12, 36);
+    ctx.fillStyle = '#ebe0d0';
+    ctx.font = '8px monospace';
+    ctx.fillText('  return <LuxuryRoom stage="premium" />', 12, 50);
+    ctx.fillStyle = '#a94f36';
+    ctx.font = '8px monospace';
+    ctx.fillText('};', 12, 64);
+    
+    // Add grid graphics
+    ctx.strokeStyle = 'rgba(212,175,55,0.08)';
+    ctx.lineWidth = 1;
+    for (let x = 0; x < 256; x += 16) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, 170); ctx.stroke();
+    }
+
+    return new THREE.CanvasTexture(canvas);
+  }, []);
+
+  return (
+    <group>
+      {/* Bottom keyboard deck chassis */}
+      <mesh position={[0, 0.005, 0]} castShadow receiveShadow>
+        <boxGeometry args={[0.34, 0.01, 0.24]} />
+        <meshStandardMaterial color={color || '#b08d57'} metalness={0.88} roughness={0.22} />
+      </mesh>
+      
+      {/* Glossy obsidian glass trackpad */}
+      <mesh position={[0, 0.011, 0.075]}>
+        <boxGeometry args={[0.09, 0.001, 0.05]} />
+        <meshStandardMaterial color="#2d2d2d" roughness={0.12} />
+      </mesh>
+
+      {/* Stylized dark keyboard grid layout */}
+      <mesh position={[0, 0.011, -0.02]} castShadow>
+        <boxGeometry args={[0.3, 0.002, 0.11]} />
+        <meshStandardMaterial color="#1a1a1b" roughness={0.7} />
+      </mesh>
+
+      {/* Angled open screen lid (rotated around back hinge) */}
+      <group position={[0, 0.008, -0.115]} rotation={[0.42, 0, 0]}>
+        {/* Back display shell (Brushed Gold/Bronze/Silver metal) */}
+        <mesh position={[0, 0.115, -0.005]} castShadow>
+          <boxGeometry args={[0.34, 0.23, 0.008]} />
+          <meshStandardMaterial color={color || '#b08d57'} metalness={0.88} roughness={0.22} />
+        </mesh>
+        
+        {/* Shiny gold logo badge on center back */}
+        <mesh position={[0, 0.115, -0.01]}>
+          <cylinderGeometry args={[0.018, 0.018, 0.002, 16]} rotation={[Math.PI/2, 0, 0]} />
+          <meshStandardMaterial color="#d4af37" metalness={0.95} roughness={0.08} />
+        </mesh>
+
+        {/* Screen inner black border bezel */}
+        <mesh position={[0, 0.115, 0.001]}>
+          <boxGeometry args={[0.33, 0.22, 0.004]} />
+          <meshStandardMaterial color="#0c0c0d" roughness={0.4} />
+        </mesh>
+
+        {/* LCD Glowing screen panel */}
+        <mesh position={[0, 0.115, 0.004]}>
+          <planeGeometry args={[0.316, 0.206]} />
+          <meshStandardMaterial 
+            map={screenTexture} 
+            roughness={0.06} // Semi-gloss screen
+            metalness={0.1}
+          />
+        </mesh>
+      </group>
     </group>
   );
 }

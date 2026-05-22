@@ -1,15 +1,18 @@
 import React, { useRef, useState, useEffect, useMemo } from 'react';
 import { Canvas, useThree, useFrame } from '@react-three/fiber';
 import * as THREE from 'three';
-import { ContactShadows, Html } from '@react-three/drei';
-import { Sofa, Bed, Table, Lamp, Plant, Art } from './FurnitureModels';
+import { ContactShadows, Html, RoundedBox } from '@react-three/drei';
+import { Sofa, Bed, Table, Lamp, Plant, Art, Chair, TV, Laptop } from './FurnitureModels';
 import PerspectiveGrid from './PerspectiveGrid';
 
 // Real-world reference dimensions in millimeters (at 100% scale)
 const FURNITURE_SPECS = {
   sofa: { w: 2.22, d: 0.92, h: 0.72, wMm: 2200, dMm: 920, hMm: 720 },
   bed: { w: 2.0, d: 2.1, h: 1.1, wMm: 2000, dMm: 2100, hMm: 1100 },
-  table: { w: 1.4, d: 0.8, h: 0.75, wMm: 1400, dMm: 800, hMm: 750 },
+  table: { w: 1.3, d: 1.3, h: 0.75, wMm: 1300, dMm: 1300, hMm: 750 }, // Square table spec
+  chair: { w: 0.65, d: 0.65, h: 0.95, wMm: 650, dMm: 650, hMm: 950 },
+  tv: { w: 1.2, d: 0.22, h: 0.8, wMm: 1200, dMm: 220, hMm: 800 },
+  laptop: { w: 0.35, d: 0.25, h: 0.22, wMm: 350, dMm: 250, hMm: 220 },
   lamp: { w: 0.45, d: 0.45, h: 1.8, wMm: 450, dMm: 450, hMm: 1800 },
   plant: { w: 0.6, d: 0.6, h: 1.4, wMm: 600, dMm: 600, hMm: 1400 },
   art: { w: 0.9, d: 0.04, h: 1.2, wMm: 900, dMm: 40, hMm: 1200 }
@@ -285,6 +288,9 @@ function DraggableItem({ item, index, isSelected, onSelect, onMove, scaleRange }
       {item.type === 'sofa' && <Sofa color={item.color} material={item.material} />}
       {item.type === 'bed' && <Bed color={item.color} material={item.material} />}
       {item.type === 'table' && <Table color={item.color} material={item.material} />}
+      {item.type === 'chair' && <Chair color={item.color} material={item.material} />}
+      {item.type === 'tv' && <TV color={item.color} material={item.material} />}
+      {item.type === 'laptop' && <Laptop color={item.color} material={item.material} />}
       {item.type === 'lamp' && <Lamp color={item.color} material={item.material} />}
       {item.type === 'plant' && <Plant />}
       {item.type === 'art' && <Art color={item.color} />}
