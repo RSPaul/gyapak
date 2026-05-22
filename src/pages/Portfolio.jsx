@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import BeforeAfterSlider from '../components/BeforeAfterSlider';
 
 const projects = [
   {
@@ -7,7 +8,8 @@ const projects = [
     category: 'living',
     tag: 'Warm Modern',
     description: 'Layered seating, custom walnut wall detailing, and soft lighting for a family-first living room.',
-    img: '/assets/images/gyapak-living-room.png'
+    img: '/assets/images/gyapak-living-room.png',
+    imgBefore: '/assets/images/gyapak-living-room-before.png'
   },
   {
     id: 2,
@@ -15,7 +17,8 @@ const projects = [
     category: 'kitchen',
     tag: 'Functional Modular',
     description: 'A practical modular kitchen with smart storage rhythm, natural stone counters, and calm materials.',
-    img: '/assets/images/gyapak-kitchen.png'
+    img: '/assets/images/gyapak-kitchen.png',
+    imgBefore: '/assets/images/gyapak-kitchen-before.png'
   },
   {
     id: 3,
@@ -23,7 +26,8 @@ const projects = [
     category: 'office',
     tag: 'Compact Utility',
     description: 'A custom work zone shaped for optimal remote productivity, vertical storage, and visual quiet.',
-    img: '/assets/images/gyapak-office.png'
+    img: '/assets/images/gyapak-office.png',
+    imgBefore: '/assets/images/gyapak-office-before.png'
   },
   {
     id: 4,
@@ -31,7 +35,8 @@ const projects = [
     category: 'bedroom',
     tag: 'Serene Rest',
     description: 'A calm bedroom utilizing earthy textured wall lime plaster, linen upholstery, and concealed ambient lights.',
-    img: '/assets/images/gyapak-bedroom.png'
+    img: '/assets/images/gyapak-bedroom.png',
+    imgBefore: '/assets/images/gyapak-bedroom-before.png'
   }
 ];
 
@@ -90,7 +95,11 @@ export default function Portfolio() {
           <div className="portfolio-grid">
             {filteredProjects.map(project => (
               <article key={project.id} className="project-card">
-                <img src={project.img} alt={project.title} />
+                <BeforeAfterSlider 
+                  beforeImg={project.imgBefore} 
+                  afterImg={project.img} 
+                  alt={project.title} 
+                />
                 <div className="project-body">
                   <div className="tag-row">
                     <span className="tag">{project.category.charAt(0).toUpperCase() + project.category.slice(1)}</span>

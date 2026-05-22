@@ -1449,3 +1449,38 @@ h4 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Before-After Interactive Swipe Slider Overrides & Refinements */
+.project-card .before-after-slider img {
+  height: 100% !important;
+  border-bottom: none !important;
+  transform: none !important;
+  transition: none !important;
+}
+
+.before-after-slider {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/10;
+  overflow: hidden;
+  user-select: none;
+  cursor: ew-resize;
+  border-bottom: 1px solid var(--line);
+}
+
+.before-after-slider:hover .slider-handle-button {
+  box-shadow: 0 0 0 6px rgba(176, 141, 87, 0.2), 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.before-after-slider:hover .slider-handle-button div {
+  transform: scale(1.25);
+}
+
+.slider-badge {
+  transition: opacity 0.25s ease;
+}
+
+.before-after-slider:hover .slider-badge {
+  opacity: 0.9;
+}
+
