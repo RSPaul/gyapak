@@ -13,7 +13,7 @@ export default function Home() {
             inset: 0;
             background-image:
               linear-gradient(90deg, rgba(17, 19, 17, 0.76), rgba(17, 19, 17, 0.38) 48%, rgba(17, 19, 17, 0.12)),
-              url("/public/assets/images/gyapak-living-room.png");
+              url("/assets/images/gyapak-living-room.png");
             background-size: cover;
             background-position: center;
             z-index: -2;
@@ -55,7 +55,7 @@ export default function Home() {
             </div>
           </div>
           <div className="media-frame">
-            <img src="/public/assets/images/gyapak-bedroom.png" alt="Elegant bedroom designed by Gyapak" />
+            <img src="/assets/images/gyapak-bedroom.png" alt="Elegant bedroom designed by Gyapak" />
           </div>
         </div>
       </section>
@@ -97,7 +97,7 @@ export default function Home() {
           </div>
           <div className="portfolio-grid">
             <article className="project-card">
-              <img src="/public/assets/images/gyapak-living-room.png" alt="Modern living room by Gyapak" />
+              <img src="/assets/images/gyapak-living-room.png" alt="Modern living room by Gyapak" />
               <div className="project-body">
                 <div className="tag-row"><span className="tag">Living Room</span><span className="tag">Warm Modern</span></div>
                 <h3>Walnut Social Lounge</h3>
@@ -105,7 +105,7 @@ export default function Home() {
               </div>
             </article>
             <article className="project-card">
-              <img src="/public/assets/images/gyapak-kitchen.png" alt="Modern kitchen by Gyapak" />
+              <img src="/assets/images/gyapak-kitchen.png" alt="Modern kitchen by Gyapak" />
               <div className="project-body">
                 <div className="tag-row"><span className="tag">Kitchen</span><span className="tag">Functional</span></div>
                 <h3>Morning Kitchen Studio</h3>
@@ -113,7 +113,7 @@ export default function Home() {
               </div>
             </article>
             <article className="project-card">
-              <img src="/public/assets/images/gyapak-office.png" alt="Home office by Gyapak" />
+              <img src="/assets/images/gyapak-office.png" alt="Home office by Gyapak" />
               <div className="project-body">
                 <div className="tag-row"><span className="tag">Home Office</span><span className="tag">Compact</span></div>
                 <h3>Focus Nook</h3>

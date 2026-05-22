@@ -15,7 +15,7 @@ export default function Team() {
         <div className="container">
           <div className="team-grid">
             <article className="team-card">
-              <div className="portrait" style={{ backgroundImage: 'url("/public/assets/images/gyapak-office.png")' }}>
+              <div className="portrait" style={{ backgroundImage: 'url("/assets/images/gyapak-office.png")' }}>
                 <span>AG</span>
               </div>
               <div className="team-body">
@@ -26,7 +26,7 @@ export default function Team() {
             </article>
 
             <article className="team-card">
-              <div className="portrait alt-1" style={{ backgroundImage: 'url("/public/assets/images/gyapak-bedroom.png")' }}>
+              <div className="portrait alt-1" style={{ backgroundImage: 'url("/assets/images/gyapak-bedroom.png")' }}>
                 <span>RK</span>
               </div>
               <div className="team-body">
@@ -37,7 +37,7 @@ export default function Team() {
             </article>
 
             <article className="team-card">
-              <div className="portrait alt-2" style={{ backgroundImage: 'url("/public/assets/images/gyapak-kitchen.png")' }}>
+              <div className="portrait alt-2" style={{ backgroundImage: 'url("/assets/images/gyapak-kitchen.png")' }}>
                 <span>MS</span>
               </div>
               <div className="team-body">

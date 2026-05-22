@@ -7,7 +7,7 @@ const projects = [
     category: 'living',
     tag: 'Warm Modern',
     description: 'Layered seating, custom walnut wall detailing, and soft lighting for a family-first living room.',
-    img: '/public/assets/images/gyapak-living-room.png'
+    img: '/assets/images/gyapak-living-room.png'
   },
   {
     id: 2,
@@ -15,7 +15,7 @@ const projects = [
     category: 'kitchen',
     tag: 'Functional Modular',
     description: 'A practical modular kitchen with smart storage rhythm, natural stone counters, and calm materials.',
-    img: '/public/assets/images/gyapak-kitchen.png'
+    img: '/assets/images/gyapak-kitchen.png'
   },
   {
     id: 3,
@@ -23,7 +23,7 @@ const projects = [
     category: 'office',
     tag: 'Compact Utility',
     description: 'A custom work zone shaped for optimal remote productivity, vertical storage, and visual quiet.',
-    img: '/public/assets/images/gyapak-office.png'
+    img: '/assets/images/gyapak-office.png'
   },
   {
     id: 4,
@@ -31,7 +31,7 @@ const projects = [
     category: 'bedroom',
     tag: 'Serene Rest',
     description: 'A calm bedroom utilizing earthy textured wall lime plaster, linen upholstery, and concealed ambient lights.',
-    img: '/public/assets/images/gyapak-bedroom.png'
+    img: '/assets/images/gyapak-bedroom.png'
   }
 ];
 

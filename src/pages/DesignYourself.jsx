@@ -4,10 +4,10 @@ import DesignerCanvas from '../components/DesignerCanvas';
 
 // Default room background options
 const templates = [
-  { id: 'living', name: 'Living Room', url: '/public/assets/images/gyapak-living-room.png' },
-  { id: 'bedroom', name: 'Bedroom', url: '/public/assets/images/gyapak-bedroom.png' },
-  { id: 'kitchen', name: 'Kitchen', url: '/public/assets/images/gyapak-kitchen.png' },
-  { id: 'office', name: 'Home Office', url: '/public/assets/images/gyapak-office.png' }
+  { id: 'living', name: 'Living Room', url: '/assets/images/gyapak-living-room.png' },
+  { id: 'bedroom', name: 'Bedroom', url: '/assets/images/gyapak-bedroom.png' },
+  { id: 'kitchen', name: 'Kitchen', url: '/assets/images/gyapak-kitchen.png' },
+  { id: 'office', name: 'Home Office', url: '/assets/images/gyapak-office.png' }
 ];
 
 // Color Swatches
@@ -490,12 +490,12 @@ export default function DesignYourself() {
               <h3>4. Staging Catalog (3D)</h3>
               <div className="furniture-catalog">
                 {[
-                  { id: 'sofa', name: 'Emerald Sofa', desc: 'Mid-Century Tufted', thumb: '/public/assets/images/thumb-sofa.png' },
-                  { id: 'bed', name: 'Deluxe Bed', desc: 'Hotel Wingback Platform', thumb: '/public/assets/images/thumb-bed.png' },
-                  { id: 'table', name: 'Carrara Table', desc: 'Polished Marble Top', thumb: '/public/assets/images/thumb-table.png' },
-                  { id: 'lamp', name: 'Arc Lamp', desc: 'Travertine & Brass', thumb: '/public/assets/images/thumb-lamp.png' },
-                  { id: 'plant', name: 'Fiddle Leaf Fig', desc: 'Fluted Ceramic Pot', thumb: '/public/assets/images/thumb-plant.png' },
-                  { id: 'art', name: 'Floating Art', desc: 'Canvas in Walnut Frame', thumb: '/public/assets/images/thumb-art.png' }
+                  { id: 'sofa', name: 'Emerald Sofa', desc: 'Mid-Century Tufted', thumb: '/assets/images/thumb-sofa.png' },
+                  { id: 'bed', name: 'Deluxe Bed', desc: 'Hotel Wingback Platform', thumb: '/assets/images/thumb-bed.png' },
+                  { id: 'table', name: 'Carrara Table', desc: 'Polished Marble Top', thumb: '/assets/images/thumb-table.png' },
+                  { id: 'lamp', name: 'Arc Lamp', desc: 'Travertine & Brass', thumb: '/assets/images/thumb-lamp.png' },
+                  { id: 'plant', name: 'Fiddle Leaf Fig', desc: 'Fluted Ceramic Pot', thumb: '/assets/images/thumb-plant.png' },
+                  { id: 'art', name: 'Floating Art', desc: 'Canvas in Walnut Frame', thumb: '/assets/images/thumb-art.png' }
                 ].map(item => (
                   <div 
                     key={item.id} 

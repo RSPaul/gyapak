@@ -15,7 +15,7 @@ export default function About() {
       <section className="section">
         <div className="container split">
           <div className="media-frame">
-            <img src="/public/assets/images/gyapak-office.png" alt="Collaborative design studio space" />
+            <img src="/assets/images/gyapak-office.png" alt="Collaborative design studio space" />
           </div>
           <div className="copy-stack">
             <p className="eyebrow">Our Philosophy</p>
