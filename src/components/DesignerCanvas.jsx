@@ -278,7 +278,7 @@ function DraggableItem({ item, index, isSelected, onSelect, onMove, scaleRange }
     <group
       ref={meshRef}
       position={[item.x, item.y || 0, item.z]}
-      rotation={[0, (item.rotation * Math.PI) / 180, 0]}
+      rotation={[((item.rotationX || 0) * Math.PI) / 180, ((item.rotation || 0) * Math.PI) / 180, 0]}
       scale={[scale, scale, scale]}
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}

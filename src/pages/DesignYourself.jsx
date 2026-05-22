@@ -20,17 +20,30 @@ const swatches = [
   { label: 'Charcoal', hex: '#2d332f' }
 ];
 
+// Reference dimensions in 3D meters (at 100% scale) for collision stacking
+const FURNITURE_SPECS = {
+  sofa: { w: 2.22, d: 0.92, h: 0.72 },
+  bed: { w: 2.0, d: 2.1, h: 1.1 },
+  table: { w: 1.3, d: 1.3, h: 0.75 },
+  chair: { w: 0.65, d: 0.65, h: 0.95 },
+  tv: { w: 1.2, d: 0.22, h: 0.8 },
+  laptop: { w: 0.35, d: 0.25, h: 0.22 },
+  lamp: { w: 0.45, d: 0.45, h: 1.8 },
+  plant: { w: 0.6, d: 0.6, h: 1.4 },
+  art: { w: 0.9, d: 0.04, h: 1.2 }
+};
+
 // Default dimensions for furniture shapes
 const furnitureDefaults = {
-  sofa: { color: '#315f73', scale: 100, rotation: 0, material: 'linen' },
-  bed: { color: '#d9cab8', scale: 100, rotation: 0, material: 'linen' },
-  table: { color: '#8b5b3d', scale: 100, rotation: 0, material: 'marble' },
-  chair: { color: '#2e3d30', scale: 100, rotation: 0, material: 'leather' },
-  tv: { color: '#1a1a1a', scale: 100, rotation: 0, material: 'none' },
-  laptop: { color: '#b08d57', scale: 100, rotation: 0, material: 'none' },
-  lamp: { color: '#b88a44', scale: 100, rotation: 0, material: 'travertine' },
-  plant: { color: '#28634f', scale: 100, rotation: 0, material: 'none' },
-  art: { color: '#a94f36', scale: 100, rotation: 0, material: 'none' }
+  sofa: { color: '#315f73', scale: 100, rotation: 0, rotationX: 0, material: 'linen' },
+  bed: { color: '#d9cab8', scale: 100, rotation: 0, rotationX: 0, material: 'linen' },
+  table: { color: '#8b5b3d', scale: 100, rotation: 0, rotationX: 0, material: 'marble' },
+  chair: { color: '#2e3d30', scale: 100, rotation: 0, rotationX: 0, material: 'leather' },
+  tv: { color: '#1a1a1a', scale: 100, rotation: 0, rotationX: 0, material: 'none' },
+  laptop: { color: '#b08d57', scale: 100, rotation: 0, rotationX: 0, material: 'none' },
+  lamp: { color: '#b88a44', scale: 100, rotation: 0, rotationX: 0, material: 'travertine' },
+  plant: { color: '#28634f', scale: 100, rotation: 0, rotationX: 0, material: 'none' },
+  art: { color: '#a94f36', scale: 100, rotation: 0, rotationX: 0, material: 'none' }
 };
 
 // Premium Fabrics Specification
@@ -134,10 +147,12 @@ export default function DesignYourself() {
     const newItem = {
       type,
       x: 0,
+      y: 0,
       z: 0,
       color: defaults.color,
       scale: defaults.scale,
       rotation: defaults.rotation,
+      rotationX: defaults.rotationX || 0,
       material: defaults.material
     };
 
@@ -161,6 +176,13 @@ export default function DesignYourself() {
     ));
   };
 
+  const handleRotationXChange = (val) => {
+    if (selectedId < 0) return;
+    setObjects(prev => prev.map((item, idx) => 
+      idx === selectedId ? { ...item, rotationX: Number(val) } : item
+    ));
+  };
+
   const handleMaterialChange = (val) => {
     if (selectedId < 0) return;
     setObjects(prev => prev.map((item, idx) => 
@@ -177,11 +199,59 @@ export default function DesignYourself() {
     setStatus(`Custom material color preset applied.`);
   };
 
-  // Dragging objects on ground plane handler
+  // Dragging objects on ground plane handler with automatic physical stacking
   const handleMoveObject = (idx, newX, newZ) => {
-    setObjects(prev => prev.map((item, id) => 
-      id === idx ? { ...item, x: newX, z: newZ } : item
-    ));
+    setObjects(prev => {
+      const updated = prev.map((item, id) => 
+        id === idx ? { ...item, x: newX, z: newZ } : item
+      );
+
+      const supportingTypes = ['table', 'sofa', 'bed', 'chair'];
+
+      return updated.map((item, id) => {
+        // Supporting items always sit on the floor
+        if (supportingTypes.includes(item.type)) {
+          return { ...item, y: 0 };
+        }
+
+        // Calculate elevation for supported items based on all other items
+        let highestY = 0;
+        updated.forEach((other, otherId) => {
+          if (id === otherId) return; // Skip self
+          if (!supportingTypes.includes(other.type)) return;
+
+          const otherSpec = FURNITURE_SPECS[other.type];
+          if (!otherSpec) return;
+
+          const otherScale = (other.scale || 100) / 100;
+          const halfW = (otherSpec.w * otherScale) / 2;
+          const halfD = (otherSpec.d * otherScale) / 2;
+
+          // Check if the center of the supported item is within horizontal bounds of the supporting item
+          const isInsideX = item.x >= (other.x - halfW) && item.x <= (other.x + halfW);
+          const isInsideZ = item.z >= (other.z - halfD) && item.z <= (other.z + halfD);
+
+          if (isInsideX && isInsideZ) {
+            let surfaceHeight = otherSpec.h * otherScale;
+
+            // Adjust surface heights realistically:
+            if (other.type === 'sofa') {
+              surfaceHeight = 0.42 * otherScale; // Cushion height
+            } else if (other.type === 'bed') {
+              surfaceHeight = 0.55 * otherScale; // Mattress height
+            } else if (other.type === 'chair') {
+              surfaceHeight = 0.46 * otherScale; // Seat height
+            }
+
+            if (surfaceHeight > highestY) {
+              highestY = surfaceHeight;
+            }
+          }
+        });
+
+        return { ...item, y: highestY };
+      });
+    });
   };
 
   // Helper to extract relative coordinates matching the 1200x760 canvas bounds
@@ -365,7 +435,7 @@ export default function DesignYourself() {
       name: base.name,
       dimensions: `${scaledW}W x ${scaledD}D x ${scaledH}H mm`,
       material: materialName,
-      rotation: `${item.rotation}°`
+      rotation: `Y: ${item.rotation}° | X: ${item.rotationX || 0}°`
     };
   };
 
@@ -994,14 +1064,29 @@ export default function DesignYourself() {
                     <div className="range">
                       <label className="range-label">
                         <span style={{ fontSize: '12px', color: 'var(--dark)' }}>Y-Rotation (Angle)</span>
-                        <span style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--rust)' }}>{activeItem.rotation}°</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--rust)' }}>{activeItem.rotation || 0}°</span>
                       </label>
                       <input 
                         type="range" 
                         min="-180" 
                         max="180" 
-                        value={activeItem.rotation} 
+                        value={activeItem.rotation || 0} 
                         onChange={(e) => handleRotationChange(e.target.value)}
+                        style={{ height: '4px' }}
+                      />
+                    </div>
+
+                    <div className="range">
+                      <label className="range-label">
+                        <span style={{ fontSize: '12px', color: 'var(--dark)' }}>X-Rotation (Angle)</span>
+                        <span style={{ fontFamily: 'monospace', fontWeight: '700', color: 'var(--rust)' }}>{activeItem.rotationX || 0}°</span>
+                      </label>
+                      <input 
+                        type="range" 
+                        min="-180" 
+                        max="180" 
+                        value={activeItem.rotationX || 0} 
+                        onChange={(e) => handleRotationXChange(e.target.value)}
                         style={{ height: '4px' }}
                       />
                     </div>
