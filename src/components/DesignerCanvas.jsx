@@ -327,22 +327,42 @@ function WallMesh({ wallPoints, wallColor, texture, calibration }) {
     // Create a 2D shape from the points
     const shape = new THREE.Shape();
     
-    // To construct the shape on our back-wall plane (Z = -4.0),
-    // we map 2D canvas coordinates into 3D space by calculating their proportional positioning.
-    // Normalized proportions: screen bounds are [1200, 760]. We scale to a 3D backwall size of [8.0, 5.0]
-    const scaleX = (x) => ((x - 600) / 600) * 5.0;
-    const scaleY = (y) => (-(y - 380) / 380) * 3.2 + (calibration.height * 0.4);
+    // We want to project each 2D point (x, y) on the canvas to the 3D plane at Z = -4.0.
+    // Normalized Device Coordinates (NDC) for a 1200x760 canvas:
+    const points3D = wallPoints.map(pt => {
+      const ndcX = (pt.x / 1200) * 2 - 1;
+      const ndcY = -(pt.y / 760) * 2 + 1;
+      
+      const vec = new THREE.Vector3(ndcX, ndcY, 0.5);
+      vec.unproject(camera);
+      
+      // Ray from camera to unprojected point:
+      const camPos = camera.position;
+      const dir = vec.sub(camPos).normalize();
+      
+      // We want to find t where Z = -4.0: camPos.z + t * dir.z = -4.0
+      // To avoid division by zero or weird math if dir.z is close to 0:
+      const targetZ = -4.0;
+      if (Math.abs(dir.z) < 0.0001) {
+        return new THREE.Vector3(0, 0, targetZ);
+      }
+      
+      const t = (targetZ - camPos.z) / dir.z;
+      const x3D = camPos.x + t * dir.x;
+      const y3D = camPos.y + t * dir.y;
+      
+      return new THREE.Vector3(x3D, y3D, targetZ);
+    });
 
-    const firstPt = wallPoints[0];
-    shape.moveTo(scaleX(firstPt.x), scaleY(firstPt.y));
-    for (let i = 1; i < wallPoints.length; i++) {
-      const pt = wallPoints[i];
-      shape.lineTo(scaleX(pt.x), scaleY(pt.y));
+    const firstPt = points3D[0];
+    shape.moveTo(firstPt.x, firstPt.y);
+    for (let i = 1; i < points3D.length; i++) {
+      shape.lineTo(points3D[i].x, points3D[i].y);
     }
     shape.closePath();
 
     return new THREE.ShapeGeometry(shape);
-  }, [wallPoints, calibration.height]);
+  }, [wallPoints, camera, calibration]);
 
   // Procedural Canvas Textures for standard rendering
   const materialProps = useMemo(() => {
@@ -410,8 +430,6 @@ function WallMesh({ wallPoints, wallColor, texture, calibration }) {
     <mesh 
       geometry={geometry} 
       position={[0, 0, -4.0]} // Placed at the back wall depth
-      receiveShadow
-      castShadow
     >
       <meshStandardMaterial {...materialProps} />
     </mesh>
